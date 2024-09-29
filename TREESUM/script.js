@@ -7,12 +7,9 @@ const treeSum = (arr) => {
     let sum = 0;
     for(let elem of arr) {
         if(Array.isArray(elem)) {
-            console.log(`Elem is ${elem}`);
             sum += treeSum(elem);
         } else if (typeof(elem) === 'number') {
-            console.log(elem);
-            sum += elem;
-            console.log(`Sum is ${sum}`);   
+            sum += elem; 
         }
     }
     return sum;
