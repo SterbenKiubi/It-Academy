@@ -10,9 +10,17 @@ const isPalindrome = (string) => {
             cleanedString += (char === 'ё') ? 'е' : char;
         }
     }
-    cleanedString = cleanedString.replace(/ь/g, '').replace(/ъ/g, '');
+    let left = 0;
+    let right = cleanedString.length -1;
 
-    return cleanedString.trim() === cleanedString.split('').reverse().join('').trim();
+    while(left < right) {
+        if(cleanedString[left] !== cleanedString[right]) {
+            return false;
+        }
+        left++;
+        right--;
+    }
+    return true;
 }
 
 if(isPalindrome(askForAString)) {
