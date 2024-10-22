@@ -14,14 +14,11 @@ const countOfVowelsInAStringForEachUse = (string) => {
 
 const countOfVowelsInAStringFilterUse = (string) => {
     const vowels = ['а', 'у', 'о', 'и', 'э', 'ы', 'я', 'ю', 'е', 'ё', 'А', 'У', 'О', 'И', 'Э', 'Ы', 'Я', 'Ю', 'Е', 'Ё'];
-    let arrOfStringChars = string.split('');
-    let filteredArr = [];
-    arrOfStringChars.filter(function(item) {
+    return string.split('').filter(function (item) {
         if(vowels.includes(item)) {
-            filteredArr.push(item)
+            return item;
         }
-    })
-    return filteredArr.length;
+    }).length;
 }
 
 const countOfVowelsInAStringReduceUse = (string) => {
