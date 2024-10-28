@@ -71,6 +71,30 @@ const components= {
                 <p>${formDef1[7].label}</p>
                 <textarea name='article' style='width: 608px; height: 50px'></textarea>
                 <input type='submit' value='${formDef1[8].caption}' style="width: 100px;">
+            </div>`,
+    surname: () => `
+    <div class="form-div">
+                <p>${formDef2[0].label}</p>
+            <input type="text" style="width: 453px;">
+            </div>`,
+    name: () => `
+    <div class="form-div">
+                <p>${formDef2[1].label}</p>
+            <input type="text" style="width: 453px;">
+            </div>`,
+    patronymic: () => `
+    <div class="form-div">
+                <p>${formDef2[2].label}</p>
+            <input type="text" style="width: 453px;">
+            </div>`,
+    age: () => `
+    <div class="form-div">
+                <p>${formDef2[3].label}</p>
+            <input type="text" style="width: 80px;">
+            </div>`,
+    registration: () => `
+    <div class="form-div">
+                <input type="submit" value="${formDef2[4].caption}">
             </div>`
 }
 
@@ -88,7 +112,14 @@ const render = () => {
     ${components.location()}
     ${components.votes()}
     ${components.description()}
+    </form>
     <hr style='margin: 15px 0 15px 0'>
+    <form method='POST' action="https://fe.it-academy.by/TestForm.php">
+    ${components.surname()}
+    ${components.name()}
+    ${components.patronymic()}
+    ${components.age()}
+    ${components.registration()}
     </form>`;
 
 }
