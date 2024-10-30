@@ -23,104 +23,86 @@ const formDef2=
   {caption:'Зарегистрироваться',kind:'submit'},
 ];
 
-// COMPOTENTS
-const components= {
-    webSiteName: () => `
-    <div class="form-div">
-                <p>${formDef1[0].label}</p>
-            <input type="text" style="width: 453px;">
-            </div>`,
-    webSiteUrl: () => `
-    <div class="form-div">
-                <p>${formDef1[1].label}</p>
-            <input type="text" style="width: 453px;">
-            </div>`,
-    visitorsPerDay: () => `
-    <div class="form-div">
-                <p>${formDef1[2].label}</p>
-            <input type="text" style="width: 80px;">
-            </div>`,
-    email: () => `
-    <div class="form-div">
-                <p>${formDef1[3].label}</p>
-            <input type="text" style="width: 200px;">
-            </div>`,
-    rubric: () => `
-    <div class="form-div">
-                <p>${formDef1[4].label}</p>
-            <select name="rubric" id="rubric" style="width: 204px;">
-                <option value="${formDef1[4].variants[0].value}">${formDef1[4].variants[0].text}</option>
-                <option value="${formDef1[4].variants[1].value}">${formDef1[4].variants[1].text}</option>
-                <option value="${formDef1[4].variants[2].value}" selected>${formDef1[4].variants[2].text}</option>
-            </select>
-            </div>`,
-    location: () => `
-    <div class="form-div">
-                <p>${formDef1[5].label}</p>
-            <input type="radio" value="${formDef1[5].variants[0].value}"><span>${formDef1[5].variants[0].text}</span>
-            <input type="radio" value="${formDef1[5].variants[1].value}"><span>${formDef1[5].variants[1].text}</span>
-            <input type="radio" value="${formDef1[5].variants[2].value}"><span>${formDef1[5].variants[2].text}</span>
-            </div>`,
-    votes: () => `
-    <div class="form-div">
-                <p>${formDef1[6].label}</p>
-            <input type="checkbox" checked>
-            </div>`,
-    description: () => `
-    <div class="form-div form-div-description">
-                <p>${formDef1[7].label}</p>
-                <textarea name='article' style='width: 608px; height: 50px'></textarea>
-                <input type='submit' value='${formDef1[8].caption}' style="width: 100px;">
-            </div>`,
-    surname: () => `
-    <div class="form-div">
-                <p>${formDef2[0].label}</p>
-            <input type="text" style="width: 453px;">
-            </div>`,
-    name: () => `
-    <div class="form-div">
-                <p>${formDef2[1].label}</p>
-            <input type="text" style="width: 453px;">
-            </div>`,
-    patronymic: () => `
-    <div class="form-div">
-                <p>${formDef2[2].label}</p>
-            <input type="text" style="width: 453px;">
-            </div>`,
-    age: () => `
-    <div class="form-div">
-                <p>${formDef2[3].label}</p>
-            <input type="text" style="width: 80px;">
-            </div>`,
-    registration: () => `
-    <div class="form-div">
-                <input type="submit" value="${formDef2[4].caption}">
-            </div>`
+const root = document.getElementById('root-container');
+
+function createForm(formDef) {
+    const form = document.createElement('form');
+    form.action = 'https://fe.it-academy.by/TestForm.php';
+
+    formDef.forEach(field => {
+        if(field.label) {
+            const label = document.createElement('label');
+            label.textContent = field.label;
+            form.appendChild(label);
+        }
+    
+
+    let input;
+    switch(field.kind) {
+        case 'longtext':
+        case 'number':
+        case 'shorttext':
+            input = document.createElement('input');
+            input.type = field.kind === 'longtext' ? 'text' : field.kind;
+            input.name = field.name;
+            break;
+        case 'dropdown':
+            input = document.createElement('select');
+            input.name = field.name;
+            field.variants.forEach(variant => {
+                const option = document.createElement('option');
+                option.value = variant.value;
+                option.text = variant.text;
+                input.add(option);
+                if(option.value == 3) {
+                    option.selected = true;
+                }
+            })
+            break;
+        case 'radio':
+            field.variants.forEach(variant => {
+                const radioDiv = document.createElement('div');
+                input = document.createElement('input');
+                input.name = field.name;
+                input.type = field.kind;
+                const radioLabel = document.createElement('label');
+                radioLabel.textContent = variant.text;
+                radioLabel.prepend(input);
+                radioDiv.appendChild(radioLabel);
+                form.appendChild(radioDiv);
+            })
+            break;
+        case 'check':
+            input = document.createElement('input');
+            input.type = 'checkbox';
+            input.name = field.name;
+            input.checked = true;
+            break;
+        case 'memo':
+            input = document.createElement('textarea');
+            input.name = field.name;
+            break;
+        case 'submit':
+            input = document.createElement('input');
+            input.type = field.kind;
+            input.value = field.caption;
+            break;
+    }
+if(input) {
+    form.appendChild(input);
+   }
+if (field.kind !== 'radio') {
+    form.appendChild(document.createElement('br'));
 }
-
-// RENDER
-const render = () => {
-    const root = document.querySelector('#root-container');
-
-    root.innerHTML = `
-    <form method='POST' action="https://fe.it-academy.by/TestForm.php">
-    ${components.webSiteName()}
-    ${components.webSiteUrl()}
-    ${components.visitorsPerDay()}
-    ${components.email()}
-    ${components.rubric()}
-    ${components.location()}
-    ${components.votes()}
-    ${components.description()}
-    </form>
-    <hr style='margin: 15px 0 15px 0'>
-    <form method='POST' action="https://fe.it-academy.by/TestForm.php">
-    ${components.surname()}
-    ${components.name()}
-    ${components.patronymic()}
-    ${components.age()}
-    ${components.registration()}
-    </form>`;
-
+if(field.kind == 'submit') {
+    const hr = document.createElement('hr');
+    hr.style.marginTop = '15px';
+    hr.style.marginBottom = '15px';
+    form.appendChild(hr);
 }
-render()
+})
+
+    root.appendChild(form);
+}
+createForm(formDef1)
+createForm(formDef2)
