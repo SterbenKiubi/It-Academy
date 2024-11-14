@@ -1,18 +1,22 @@
-const myForm = document.getElementById('myForm')
-// COMPONENTS
+// MY FORM
+const myForm = document.getElementById('myForm');
+// MY FORM'S COMPONENTS
 const components = {
     developers: () => `<div id="developers-container">
         <label for="developersInput">Разработчики:</label>
         <input id="developersInput" type='text' name='DEVELOPERS' style='width: 453px'>
+        <span id="developersErr"></span>
       </div>`,
     sitename: () => `<div id="sitename-container">
         <label for="sitenameInput">Название сайта:</label>
         <input id="sitenameInput" type='text' name='SITENAME' style='width: 453px'>
+        <span id="sitenameErr"></span>
       </div>
       `,
     url: () => `<div id="url-container">
         <label for="url">URL сайта:</label>
         <input id="urlInput" type='text' name='URL' style='width: 300px'>
+        <span id="urlErr"></span>
       </div>
       `,
     date: () => `<div id="date-container">
@@ -77,14 +81,18 @@ const render = () => {
 render()
 
 // CONSTANTS
+
 const developersContainer = document.getElementById('developers-container');
 const developersInput = document.getElementById('developersInput');
+const developersErr = document.getElementById('developersErr');
 
 const siteNameContainer = document.getElementById('sitename-container');
 const siteNameInput = document.getElementById('sitenameInput');
+const sitenameErr = document.getElementById('sitenameErr');
 
 const urlContainer = document.getElementById('url-container');
 const urlInput = document.getElementById('urlInput');
+const urlErr = document.getElementById('urlErr');
 
 const dateContainer = document.getElementById('date-container');
 const dateInput = document.getElementById('dateInput');
@@ -111,113 +119,56 @@ const articleTextarea = document.getElementById('article-textarea');
 
 const submitButton = document.getElementById('submit');
 
-let errorMessage;
+// EVENT LISTENERS
+developersInput.addEventListener('blur', develoversValid);
 
-// ADD AND DELETE ERROR MESSAGE
-const addErrorMessageAndFocusOnInput = (container, input) => {
-  if(input == developersInput || input == siteNameInput || input == urlInput || input == emailInput) {
-    errorMessage = 'Поле не должно быть пустым или содержать более 30-ти символов!'
-  } else if (input == dateInput) {
-    errorMessage = 'Вы не выбрали дату!'
-  } else if (input == visitorsInput) {
-    errorMessage = 'Введите действительное шестизначное число'
-  } else if (input == rubricSelect) {
-    errorMessage = 'Категория бытовая техника закрыта!'
-  } else if (input == reviewsCheckbox) {
-    errorMessage = 'Разрешите отзывы!'
-  } else if (input == articleTextarea) {
-    errorMessage = 'Опишите сайт!'
-  } 
-  
-  const errorMessageTag = document.createElement('span');
-  errorMessageTag.textContent = errorMessage;
-  errorMessageTag.style.color = 'red';
-  container.appendChild(errorMessageTag)
-  // input.focus()
-}
-const removeErrorMessage = (container) => {
-  container.removeChild(container.lastChild)
+function develoversValid() {
+  let errFlag = false;
+
+  if( !developersInput.value ) {
+    developersErr.innerHTML = 'Поле не может быть пустым!';
+    errFlag = true;
+  } else {
+    developersErr.innerHTML = '';
+  }  
+  return errFlag;
 }
 
-// LISTENERS
-developersInput.addEventListener('blur', function() {
-  if (developersInput.value.length > 30 || developersInput.value == '') {
-    addErrorMessageAndFocusOnInput(developersContainer, developersInput);
-  } else {
-    removeErrorMessage(developersContainer)
-  }
-} );
+siteNameInput.addEventListener('blur', siteNameValid);
 
-siteNameInput.addEventListener('blur', function() {
-  if (siteNameInput.value.length > 30 || siteNameInput.value == '') {
-    addErrorMessageAndFocusOnInput(siteNameContainer, siteNameInput);
-  } else {
-    removeErrorMessage(siteNameContainer)
-  }
-} );
+function siteNameValid() {
+  let errFlag = false;
 
-urlInput.addEventListener('blur', function() {
-  if (urlInput.value.length > 30 || urlInput.value == '') {
-    addErrorMessageAndFocusOnInput(urlContainer, urlInput);
+  if( !siteNameInput.value ) {
+    sitenameErr.innerHTML = 'Поле не может быть пустым!';
+    errFlag = true;
   } else {
-    removeErrorMessage(urlContainer)
-  }
-} );
+    sitenameErr.innerHTML = '';
+  }  
+  return errFlag;
+}
 
-visitorsInput.addEventListener('blur', function() {
-  if (isNaN(visitorsInput.value) || visitorsInput.value == '' || visitorsInput.value.length > 6 ) {
-    addErrorMessageAndFocusOnInput(visitorsContainer, visitorsInput);
-  } else {
-    removeErrorMessage(visitorsContainer)
-  }
-} );
+urlInput.addEventListener('blur', urlValid);
 
-emailInput.addEventListener('blur', function() {
-  if (emailInput.value.length > 30 || emailInput.value == '') {
-    addErrorMessageAndFocusOnInput(emailContainer, emailInput);
+function urlValid() {
+  let errFlag = false;
+  if( !urlInput.value ) {
+    urlErr.innerHTML = 'Поле не может быть пустым!';
+    errFlag = true;
   } else {
-    removeErrorMessage(emailContainer)
-  }
-} );
+    urlErr.innerHTML = '';
+  }  
+  return errFlag;
+}
 
-articleTextarea.addEventListener('blur', function() {
-  if (articleTextarea.value.length > 30 || articleTextarea.value == '') {
-    addErrorMessageAndFocusOnInput(articleContainer, articleTextarea);
-  } else {
-    removeErrorMessage(articleContainer)
-  }
-} );
+myForm.addEventListener('submit', formSubmit);
 
-submitButton.addEventListener('click', function() {
-  event.preventDefault()
-  if (dateInput.value == '') {
-    addErrorMessageAndFocusOnInput(dateContainer, dateInput);
-    console.log(publicInputOne.checked);
-    console.log(publicContainer.childNodes);
-    console.log(reviewsCheckbox.checked);
-  } else {
-    removeErrorMessage(dateContainer)
+function formSubmit() {
+  if ( develoversValid() || siteNameValid() || urlValid()) {
+    event.preventDefault()
   }
-  if (rubricSelect.value == 3) {
-    addErrorMessageAndFocusOnInput(rubricContainer, rubricSelect);
-  } else {
-    removeErrorMessage(rubricContainer)
-  }
-  if (!(publicInputOne.checked)) {
-    const errorMessageTag = document.createElement('span');
-      errorMessageTag.textContent = 'У нас бесплатное размещение!';
-      errorMessageTag.style.color = 'red';
-      publicContainer.appendChild(errorMessageTag)
-  } else {
-      publicContainer.removeChild(publicContainer.lastChild)
-  }
-  if (!(reviewsCheckbox.checked)) {
-    addErrorMessageAndFocusOnInput(reviewsContainer, reviewsCheckbox);
-  } else {
-    removeErrorMessage(reviewsContainer)
-  }
-  
-});
+}
+
 
 
 
