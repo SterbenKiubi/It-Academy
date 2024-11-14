@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset=UTF-8>
+    <title>drag&amp;drop</title>
+  </head>
+  <body style='min-height: 100vh'>
+<img src='http://fe.it-academy.by/Sites/0000007/sax.jpg'>
+<img src='http://fe.it-academy.by/Sites/0000007/Yin_and_Yang.png' width=100>
+<img src='http://fe.it-academy.by/Sites/0000007/Man-and-woman.png' width=150>
+<img src='http://fe.it-academy.by/Sites/0000007/No_smoking.png' style='padding-left: 50px'>
+
+<script>
+  // здесь ваш код
+  let selectedImage = null;
+  let offsetX = 0, offsetY = 0;
+
+  // GET ALL IMAGES
+  const images = document.querySelectorAll('img');
+//   console.log(images[0]);
+  
+
+  images.forEach(img => {
+    img.style.position = 'absolute';
+
+    images[0].style.left = '10px';
+    images[0].style.top = '60px';
+
+    images[1].style.left = '200px';
+    images[1].style.top = '170px';
+
+    images[2].style.left = '320px';
+    images[2].style.top = '100px';
+
+    images[3].style.left = '450px';
+    images[3].style.top = '10px';
+
+// LISTENER FOR IMAGE
+    img.addEventListener('mousedown', (e) => {
+      selectedImage = img;
+
+      selectedImage.style.zIndex = 1000;
+
+      offsetX = e.clientX - img.getBoundingClientRect().left;
+      offsetY = e.clientY - img.getBoundingClientRect().top;
+      document.body.style.cursor = 'grab';
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    });
+  });
+
+  function onMouseMove(e) {
+    if (selectedImage) {
+      selectedImage.style.left = (e.clientX - offsetX) + 'px';
+      selectedImage.style.top = (e.clientY - offsetY) + 'px';
+    }
+  }
+
+  function onMouseUp() {
+    if (selectedImage) {
+      selectedImage.style.zIndex = '';
+      selectedImage = null;
+      document.body.style.cursor = 'default';
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    }
+  }
+</script>
+
+  </body>
+</html>
