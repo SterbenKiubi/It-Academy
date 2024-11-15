@@ -10,72 +10,71 @@
 <img src='http://fe.it-academy.by/Sites/0000007/Man-and-woman.png' width=150>
 <img src='http://fe.it-academy.by/Sites/0000007/No_smoking.png' style='padding-left: 50px'>
 
-<script>
-  // здесь ваш код
-  window.addEventListener('load', () => {
+  <script>
+    // здесь ваш код
+    window.addEventListener('load', () => {
     let selectedImage = null;
-  let offsetX = 0, offsetY = 0;
-  let zIndex = 1;
+    let offsetX = 0;
+    let offsetY = 0;
+    let zIndex = 1;
 
-  // GET ALL IMAGES
-  const images = document.querySelectorAll('img');
+    // GET ALL IMAGES
+    const images = document.querySelectorAll('img');
 
-  // ARRAYS OF IMAGE'S POSITIONS
-  const imgLeftPositions = [];
-  const imgTopPositions = [];
+    // ARRAYS OF IMAGE'S POSITIONS
+    const imgLeftPositions = [];
+    const imgTopPositions = [];
 
-  // PUSHING TO ARRAYS THE ACTUAL POSITIONS 
-  images.forEach(img => {
-    imgLeftPositions.push(img.getBoundingClientRect().left);
-    imgTopPositions.push(img.getBoundingClientRect().top);
-  })
-  
-  
-// POSITIONING IMAGES
-  images.forEach((img,thisArg) => {
-    img.style.position = 'absolute';
-    // console.log(`${imgLeftPositions[thisArg]}`);
-    console.log(`${imgTopPositions[thisArg]}`);
-    img.style.left = `${imgLeftPositions[thisArg]}px`;
-    img.style.top = `${imgTopPositions[thisArg]}px`;
-    
+    // PUSHING TO ARRAYS THE ACTUAL POSITIONS 
+    images.forEach(img => {
+      imgLeftPositions.push(img.getBoundingClientRect().left);
+      imgTopPositions.push(img.getBoundingClientRect().top);
+    })
+      
+      // POSITIONING IMAGES
+      images.forEach((img, index) => {
+        img.style.position = 'absolute';
+        // console.log(`${imgLeftPositions[index]}`);
+        // console.log(`${imgTopPositions[index]}`);
+        img.style.left = `${imgLeftPositions[index]}px`;
+        img.style.top = `${imgTopPositions[index]}px`;
+        
+        // LISTENER FOR IMAGE
+        img.addEventListener('mousedown', (e) => {
+          event.preventDefault(); // cancellation drag&drop
+          selectedImage = img;
 
-// LISTENER FOR IMAGE
-    img.addEventListener('mousedown', (e) => {
-      event.preventDefault(); // cancellation drag&drop
-      selectedImage = img;
+          zIndex += 1;
+          selectedImage.style.zIndex = zIndex;
 
-      selectedImage.style.zIndex = 1000;
+          offsetX = e.clientX - img.getBoundingClientRect().left;
+          offsetY = e.clientY - img.getBoundingClientRect().top;
+          document.body.style.cursor = 'grab';
+          document.addEventListener('mousemove', onMouseMove);
+          document.addEventListener('mouseup', onMouseUp);
+        });
+      });
 
-      offsetX = e.clientX - img.getBoundingClientRect().left;
-      offsetY = e.clientY - img.getBoundingClientRect().top;
-      document.body.style.cursor = 'grab';
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', onMouseUp);
-    });
-  });
+          function onMouseMove(e) {
+            event.preventDefault();
+            if (selectedImage) {
+              selectedImage.style.left = (e.clientX - offsetX) + 'px';
+              selectedImage.style.top = (e.clientY - offsetY) + 'px';
+            }
+          }
 
-  function onMouseMove(e) {
-    event.preventDefault();
-    if (selectedImage) {
-      selectedImage.style.left = (e.clientX - offsetX) + 'px';
-      selectedImage.style.top = (e.clientY - offsetY) + 'px';
-    }
-  }
+          function onMouseUp() {
+            event.preventDefault();
+            if (selectedImage) {
+              selectedImage = null;
+              document.body.style.cursor = 'default';
+              document.removeEventListener('mousemove', onMouseMove);
+              document.removeEventListener('mouseup', onMouseUp);
+            }
+          }
+    })
 
-  function onMouseUp() {
-    event.preventDefault();
-    if (selectedImage) {
-      selectedImage.style.zIndex = '';
-      selectedImage = null;
-      document.body.style.cursor = 'default';
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
-    }
-  }
-  })
-
-</script>
+  </script>
 
   </body>
 </html>
