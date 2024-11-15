@@ -12,7 +12,8 @@
 
 <script>
   // здесь ваш код
-  let selectedImage = null;
+  window.addEventListener('load', () => {
+    let selectedImage = null;
   let offsetX = 0, offsetY = 0;
 
   // GET ALL IMAGES
@@ -33,7 +34,7 @@
   images.forEach((img,thisArg) => {
     img.style.position = 'absolute';
     // console.log(`${imgLeftPositions[thisArg]}`);
-    // console.log(`${imgTopPositions[thisArg]}`);
+    console.log(`${imgTopPositions[thisArg]}`);
     img.style.left = `${imgLeftPositions[thisArg]}px`;
     img.style.top = `${imgTopPositions[thisArg]}px`;
     
@@ -68,6 +69,8 @@
       document.removeEventListener('mouseup', onMouseUp);
     }
   }
+  })
+
 </script>
 
   </body>
