@@ -15,6 +15,7 @@
   window.addEventListener('load', () => {
     let selectedImage = null;
   let offsetX = 0, offsetY = 0;
+  let zIndex = 1;
 
   // GET ALL IMAGES
   const images = document.querySelectorAll('img');
@@ -41,6 +42,7 @@
 
 // LISTENER FOR IMAGE
     img.addEventListener('mousedown', (e) => {
+      event.preventDefault(); // cancellation drag&drop
       selectedImage = img;
 
       selectedImage.style.zIndex = 1000;
@@ -54,6 +56,7 @@
   });
 
   function onMouseMove(e) {
+    event.preventDefault();
     if (selectedImage) {
       selectedImage.style.left = (e.clientX - offsetX) + 'px';
       selectedImage.style.top = (e.clientY - offsetY) + 'px';
@@ -61,6 +64,7 @@
   }
 
   function onMouseUp() {
+    event.preventDefault();
     if (selectedImage) {
       selectedImage.style.zIndex = '';
       selectedImage = null;
