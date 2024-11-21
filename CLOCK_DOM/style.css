@@ -1,0 +1,43 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+}
+#clock {
+    position: relative;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+}
+
+.hidden {
+    display: none;
+}
+
+#hour-hand, #minute-hand, #second-hand {
+    position: absolute;
+    background: #333333;
+    transform-origin: 49% 94%;
+    bottom: 50%;
+    border-radius: 25px;
+}
+
+#hour-hand {
+    width: 6px;
+    height: 25%;
+}
+
+#minute-hand {
+    width: 4px;
+    height: 30%;
+}
+
+#second-hand {
+    width: 2px;
+    height: 40%;
+    background: #333;
+}
