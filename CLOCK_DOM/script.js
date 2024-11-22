@@ -83,7 +83,7 @@ const drawClock = () => {
     drawClockNumbers()
 }
 const drawElectronicClock = () => {
-    electronicClock.style.fontSize = '150%';
+    electronicClock.style.fontSize = `${diameter * FONT_SIZE_FACTOR}px`;
     electronicClock.style.position = 'absolute';
     electronicClock.style.top = '20%'; 
 
