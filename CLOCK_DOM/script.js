@@ -1,7 +1,7 @@
 // CONSTANTS 
 const MIN_DIAMETER = 200;
 const MAX_DIAMETER = 800;
-
+const FONT_SIZE_FACTOR = 0.1;
 // ELEMENTS
 const clockContainer = document.getElementById('clock-container');
 const inputContainer = document.getElementById('input-container');
@@ -56,15 +56,20 @@ const drawClockNumbers = () => {
     for( let i = 0; i <= 12; i += 1) {
         const number = document.createElement('div');
         number.textContent = i;
+        number.textContent.toString()
         number.style.position = 'absolute';
         number.style.transform = 'translate(-50%, -50%)';
         number.style.backgroundColor = '#28a502';
         number.style.borderRadius = '50%';
-        number.style.width = '7%';
-        number.style.height = '7%';
+        number.style.width = '10%';
+        number.style.height = '10%';
         number.style.display = 'flex';
         number.style.alignItems = 'center';
         number.style.justifyContent = 'center';
+        number.style.fontSize = `${diameter * FONT_SIZE_FACTOR}px`;
+        
+        console.log(typeof(i));
+        
 
         // ANGLE FOR NUMBERS
         const angle = (i * 30) * (Math.PI / 180);
@@ -89,7 +94,6 @@ const drawElectronicClock = () => {
 }
 const updateElectronicClock = (time) => {
     const { hours, minutes, seconds } = time;
-
     electronicClock.innerHTML = `${getStingTime(hours)}:${getStingTime(minutes)}:${getStingTime(seconds)}`;
 }
 
