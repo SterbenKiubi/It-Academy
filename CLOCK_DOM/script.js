@@ -40,8 +40,6 @@ const getTime = () => {
     const hours = now.getHours() % 24;
     const minutes = now.getMinutes();
     const seconds = now.getSeconds();
-    console.log(`${hours}:${minutes}:${seconds}`);
-    
 
     return { hours, minutes, seconds };
 }
@@ -91,6 +89,8 @@ const drawElectronicClock = () => {
 const updateElectronicClock = (time) => {
     const { hours, minutes, seconds } = time;
     electronicClock.innerHTML = `${getStingTime(hours)}:${getStingTime(minutes)}:${getStingTime(seconds)}`;
+    console.log(electronicClock.innerHTML);
+    
 }
 
 const updateClock = (time) => {
