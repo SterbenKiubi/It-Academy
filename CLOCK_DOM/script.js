@@ -1,7 +1,8 @@
 // CONSTANTS 
 const MIN_DIAMETER = 200;
 const MAX_DIAMETER = 800;
-const FONT_SIZE_FACTOR = 0.1;
+const FONT_SIZE_FACTOR = 0.07;
+
 // ELEMENTS
 const clockContainer = document.getElementById('clock-container');
 const inputContainer = document.getElementById('input-container');
@@ -23,8 +24,6 @@ const getDiameter = () => {
     diameter = !Number.isNaN(numValue) ? numValue : 0;
 }
 const validateClockDiameter = () => {
-    console.log(diameter)
-
     return diameter >= MIN_DIAMETER && diameter <= MAX_DIAMETER
 }
 
@@ -41,6 +40,8 @@ const getTime = () => {
     const hours = now.getHours() % 24;
     const minutes = now.getMinutes();
     const seconds = now.getSeconds();
+    console.log(`${hours}:${minutes}:${seconds}`);
+    
 
     return { hours, minutes, seconds };
 }
@@ -61,15 +62,12 @@ const drawClockNumbers = () => {
         number.style.transform = 'translate(-50%, -50%)';
         number.style.backgroundColor = '#28a502';
         number.style.borderRadius = '50%';
-        number.style.width = '10%';
-        number.style.height = '10%';
+        number.style.width = '7%';
+        number.style.height = '7%';
         number.style.display = 'flex';
         number.style.alignItems = 'center';
         number.style.justifyContent = 'center';
         number.style.fontSize = `${diameter * FONT_SIZE_FACTOR}px`;
-        
-        console.log(typeof(i));
-        
 
         // ANGLE FOR NUMBERS
         const angle = (i * 30) * (Math.PI / 180);
@@ -87,9 +85,7 @@ const drawClock = () => {
 const drawElectronicClock = () => {
     electronicClock.style.fontSize = '150%';
     electronicClock.style.position = 'absolute';
-    electronicClock.style.top = '20%';
-
-    electronicClock.innerHTML = `${0}:${0}:${0}`;
+    electronicClock.style.top = '20%'; 
 
 }
 const updateElectronicClock = (time) => {
