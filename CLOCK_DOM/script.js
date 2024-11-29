@@ -55,7 +55,7 @@ const drawClockNumbers = () => {
     for( let i = 0; i <= 12; i += 1) {
         const number = document.createElement('div');
         number.textContent = i;
-        number.textContent.toString()
+        number.textContent.toString();
         number.style.position = 'absolute';
         number.style.transform = 'translate(-50%, -50%)';
         number.style.backgroundColor = '#28a502';
