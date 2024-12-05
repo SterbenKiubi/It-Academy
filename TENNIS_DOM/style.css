@@ -1,0 +1,45 @@
+body {
+    display: flex;
+    flex-direction: column;
+}
+.button-and-score {
+    display: grid;
+    width: 800px;
+    margin-bottom: 15px;
+}
+.start-button {
+    justify-self: flex-start;
+}
+.score {
+    justify-self: center;
+    display: flex;
+    gap: 30px;
+}
+
+.game-area {
+    position: relative;
+    width: 800px;
+    height: 500px;
+    border: 2px solid black;
+    background-color: rgb(230, 230, 133);
+}
+.racket {
+    position: absolute;
+    width: 10px;
+    height: 100px;
+}
+.left-racket {
+    left: 0;
+    background-color: green;
+}
+.right-racket {
+    right: 0;
+    background-color: blue;
+}
+.ball {
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    background-color: red;
+    border-radius: 50%;
+}
