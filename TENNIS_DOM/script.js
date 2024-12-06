@@ -18,7 +18,7 @@ const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1) ) + m
 
 // SPEED
 const RACKET_SPEED = 5;
-const BALL_SPEED = 1;
+const BALL_SPEED = 0.5;
 
 // VARIABLES FOR GAME
 let ballDirectionX = Math.random() < 0.5 ? BALL_SPEED : -BALL_SPEED; 
@@ -96,21 +96,21 @@ const updateRackets = () => {
 }
 const startGame = () => {
     const player1 = {
-        racket: { // set racket position here
+        racket: { 
             top: 0,
             bottom: (ballGameArea.maxY - ballGameArea.minX) / 2,
         },
         score: 0,
     }
     const player2 = {
-        racket: { // set correct racket here
+        racket: { 
             top: 0,
             bottom: (ballGameArea.maxY - ballGameArea.minX) / 2,
         },
         score: 0,
     }
     let intervalId;
-    const monitor144Hz = 1000 / 144; // ToDo: ask should we use RequestAnimationFrame
+    const monitor144Hz = 1000 / 144; 
 
     const ballRun = () => {
         ball.x += ball.directionX;
