@@ -1,0 +1,17 @@
+.flex-wrapper{ 
+    display: flex; 
+    background-color: beige; 
+  } 
+  .flex-wrapper > div { 
+    background-color: green; 
+    height: 100px; 
+    width: 100px; 
+    margin: 10px; 
+  } 
+  .flex-wrapper > div { 
+    flex-grow: 1; 
+  }
+  #one{ 
+    flex-grow: 10;
+  } 
+ 
