@@ -22,7 +22,8 @@
     flex-direction: column;
     align-items: center;
     gap: 2em;
-    height: 50%;
+    width: 80%;
+    max-width: 728px;
 }
 
 .title {
@@ -32,6 +33,7 @@
 }
 
 .title-icon-wrapper {
+  width: 100%;
   animation: orchestra-title-icon var(--animation-duration) cubic-bezier(.67,1.1,.76,.27);
 }
 
@@ -196,5 +198,25 @@
   70% {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+@media screen and (max-width: 807px) {
+  h2 {
+    font-size: 1.3em;
+  }
+}
+@media screen and (max-width: 700px) {
+  h2 {
+    font-size: 1em;
+  }
+}
+@media screen and (max-width: 540px) {
+  h2 {
+    font-size: 0.8em;
+  }
+}
+@media screen and (max-width: 430px) {
+  h2 {
+    font-size: 0.55em;
   }
 }
