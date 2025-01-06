@@ -1,4 +1,4 @@
-// Elements
+// ====== ЭДЕМЕНТЫ ======
 const headerTitle = document.getElementById('header-title');
 const footer = document.getElementById('footer');
 const buttonLogin = document.getElementById('button-login');
@@ -18,14 +18,25 @@ const appState = {
     baseUrl: 'https://jsonplaceholder.typicode.com',
     usersUrl: '/users',
   },
+  modal: {
+    title: 'Log-In',
+    backgroundImage: 'url(/img/close-button.png)',
+    emailLabel: 'E-mail:',
+    passwordLabel: 'Password:',
+    submitButtonText: 'Login',
+  },
   error: '',
   isLoading: false,
 }
 
 // ====== ФУНКЦИИ ======
+const showModal = () => {
+  const modal = createModal();
+  document.body.appendChild(modal);
+}
 
 
-// Services
+// ====== СЕРВИСЫ ======
 const getUsers = async () => {
   const { service: { baseUrl, usersUrl } } = appState;
   const url = baseUrl + usersUrl;
@@ -47,7 +58,7 @@ const removeUserNameWrapper = () => {
   article.removeChild(userNameWrapper)
 }
 
-// Handlers
+// ====== ОБРАБОТЧИКИ ======
 const userHandler = async () => {
   userName = userNameInput.value;
   console.log(userName);
@@ -67,7 +78,9 @@ const userHandler = async () => {
   console.log(JSON.stringify(appState.isLoading))
 }
 
-// MODAL
+buttonLogin.addEventListener('click', showModal);
+
+// ====== МОДАЛЬНОЕ ОКНО ======
 const createModal = () => {
   const modalWrapper = document.createElement('div');
   modalWrapper.id = 'modal-wrapper';
@@ -82,13 +95,17 @@ const createModal = () => {
 
   const modalTitle = document.createElement('h3');
   modalTitle.className = 'modal-title';
-  modalTitle.textContent = 'Log-In';
+  modalTitle.textContent = appState.modal.title;
 
   const modalCloseButton = document.createElement('button');
   modalCloseButton.id = 'modal-close';
   modalCloseButton.type = 'button';
   modalCloseButton.className = 'modal-close';
-  modalCloseButton.textContent = 'X';
+  modalCloseButton.style.backgroundImage = appState.modal.backgroundImage;
+  modalCloseButton.style.backgroundSize = 'cover';
+  modalCloseButton.style.width = '30px'
+  modalCloseButton.style.height = '30px'
+  modalCloseButton.style.border = '0';
 
   modalHeader.appendChild(modalTitle);
   modalHeader.appendChild(modalCloseButton);
@@ -101,7 +118,7 @@ const createModal = () => {
 
   const emailLabel = document.createElement('label');
   emailLabel.setAttribute('for', 'e-mail');
-  emailLabel.textContent = 'E-mail:';
+  emailLabel.textContent = appState.modal.emailLabel;
 
   const emailInput = document.createElement('input');
   emailInput.name = 'e-mail';
@@ -110,7 +127,7 @@ const createModal = () => {
 
   const passwordLabel = document.createElement('label');
   passwordLabel.setAttribute('for', 'password');
-  passwordLabel.textContent = 'Password:';
+  passwordLabel.textContent = appState.modal.passwordLabel;
 
   const passwordInput = document.createElement('input');
   passwordInput.name = 'password';
@@ -129,7 +146,7 @@ const createModal = () => {
   submitButton.id = 'modal-submit-button';
   submitButton.type = 'submit';
   submitButton.className = 'modal-submit-button';
-  submitButton.textContent = 'LogIn';
+  submitButton.textContent = appState.modal.submitButtonText;
 
   modalFooter.appendChild(submitButton);
 
@@ -140,6 +157,8 @@ const createModal = () => {
   modal.appendChild(modalForm);
 
   modalWrapper.appendChild(modal);
+
+  appState.modal.isModalShown = true;
 
   return modalWrapper;
 }
@@ -153,8 +172,8 @@ const render = () => {
 
   footer.innerHTML = appState.footer.author;
 
-  const modal = createModal();
-  document.body.appendChild(modal);
+  // const modal = createModal();
+  // document.body.appendChild(modal);
 }
 render();
 
