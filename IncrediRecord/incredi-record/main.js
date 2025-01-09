@@ -19,21 +19,27 @@ const appState = {
     usersUrl: '/users',
   },
   modal: {
-    title: 'Log-In',
-    backgroundImage: 'url(/img/close-button.png)',
-    emailLabel: 'E-mail:',
-    passwordLabel: 'Password:',
-    submitButtonText: 'Login',
+    login: {
+      title: 'Log-In',
+      emailLabel: 'E-mail:',
+      passwordLabel: 'Password:',
+      submitButtonText: 'Login',
+      isModalShown: false,
+    },
+    signin: {
+      title: 'Sign-In',
+      emailLabel: 'E-mail:',
+      passwordLabel: 'Password:',
+      submitButtonText: 'Create user',
+      isModalShown: false,
+    },
   },
+  user: undefined,
   error: '',
   isLoading: false,
 }
 
 // ====== ФУНКЦИИ ======
-const showModal = () => {
-  const modal = createModal();
-  document.body.appendChild(modal);
-}
 
 
 // ====== СЕРВИСЫ ======
@@ -45,43 +51,176 @@ const getUsers = async () => {
   const users = await response.json();
 
   return users;
-}
+};
 
-const postUser = (req, res) => {}
+const postUser = async (email, password) => {
+  const { service: { baseUrl, usersUrl } } = appState;
+  const url = baseUrl + usersUrl;
+  
+  const response = await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify({
+      email,
+      address: {
+        zipcode: password,
+      },
+    }),
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+  });
+  
+  const user = await response.json();
+  
+  return user;
+};
 
 const userService = {
   getUsers,
   postUser,
+};
+
+const userLocalService = {
+  postUser: (user) => {
+    const usersFromLS = localStorage.getItem('incredy-record-users');
+    const existedUsers = JSON.parse(usersFromLS) || [];
+
+    const users = JSON.stringify([...existedUsers, user]);
+    localStorage.setItem('incredy-record-users', users);
+  },
+  getUsers: () => {
+    const usersFromLS = localStorage.getItem('incredy-record-users');
+    const existedUsers = JSON.parse(usersFromLS) || [];
+
+    return existedUsers;
+  }
 }
 
-const removeUserNameWrapper = () => {
-  article.removeChild(userNameWrapper)
+const closeModal = () => {
+  const modal = document.getElementById('modal-wrapper');
+
+  const modalEntries = Object.entries(appState.modal);
+  modalEntries.forEach((entries) => {
+    const modalName = entries[0];
+    appState.modal[modalName].isModalShown = false
+  });
+
+  modal.removeEventListener('click', modalClickHandler);
+  document.body.removeChild(modal);
 }
 
 // ====== ОБРАБОТЧИКИ ======
-const userHandler = async () => {
-  userName = userNameInput.value;
-  console.log(userName);
-  removeUserNameWrapper()
-  
+const loginHandler = async (email, password) => {
   try {
     appState.isLoading = true;
-    console.log(JSON.stringify(appState.isLoading))
-    const users = await userService.getUsers();
+    const usersFromDB = await userService.getUsers();
+    const usersFromLS = userLocalService.getUsers();
+    const users = [...usersFromDB, ...usersFromLS];
     console.log(users);
-  } catch(err) {
+
+    const user = users.find((user) => {
+      return user.email === email && user.address.zipcode === password;
+    });
+
+    if (user) {
+      appState.user = user;
+      appState.error = '';
+    } else {
+      throw new Error('Invalid email or password');
+    }
+  } catch (err) {
+    console.error(err);
     appState.error = err.message;
   } finally {
     appState.isLoading = false;
+    
+    closeModal();
+  }
+};
+
+const signinHandler = async(email, password) => {
+  try {
+    appState.isLoading = true;
+    const user = await userService.postUser(email, password);
+
+    if (user) {
+      userLocalService.postUser(user);
+      appState.user = user;
+      appState.error = '';
+    } else {
+      throw new Error('User was not craeted');
+    }
+  } catch (err) {
+    console.error(err);
+    appState.error = err.message;
+  } finally {
+    appState.isLoading = false;
+
+    closeModal();
+  }
+}
+const modalClickHandler = (clickEvent) => {
+  const { target: { id } } = clickEvent; 
+
+  if (id === 'modal-close' || id === 'modal-wrapper' || id === 'modal-close-div-left' || id === 'modal-close-div-right') {
+    closeModal();
   }
 
-  console.log(JSON.stringify(appState.isLoading))
+  if (id === 'modal-submit-button') {
+    clickEvent.preventDefault();
+    const email = document.getElementById('modal-email').value;
+    const password = document.getElementById('modal-password').value;
+
+    const modalEntries = Object.entries(appState.modal);
+    const modalEntry = modalEntries.filter((entries) => {
+      const modalValue = entries[1];
+
+      return modalValue.isModalShown;
+    })[0];
+
+    const modalName = modalEntry[0];
+
+    if (modalName === 'login') {
+      loginHandler(email, password);
+    }
+
+    if (modalName === 'signin') {
+      signinHandler(email, password);
+    }
+  }
 }
 
-buttonLogin.addEventListener('click', showModal);
+const showLoginModal = () => {
+  const modal = createModal(appState.modal.login);
+
+  document.body.appendChild(modal);
+  appState.modal.login.isModalShown = true;
+  document.getElementById('modal-email').focus();
+
+  modal.addEventListener('click', modalClickHandler);
+};
+const showSigninModal = () => {
+  const modal = createModal(appState.modal.signin);
+
+  document.body.appendChild(modal);
+  appState.modal.signin.isModalShown = true;
+  document.getElementById('modal-email').focus();
+
+  modal.addEventListener('click', modalClickHandler);
+};
+
+buttonLogin.addEventListener('click', showLoginModal);
+buttonSignin.addEventListener('click', showSigninModal);
 
 // ====== МОДАЛЬНОЕ ОКНО ======
-const createModal = () => {
+const createModal = (config) => {
+  const {
+    title,
+    emailLabel: emailLabelValue,
+    passwordLabel: passwordLabelValue,
+    submitButtonText,
+  } = config;
+
   const modalWrapper = document.createElement('div');
   modalWrapper.id = 'modal-wrapper';
   modalWrapper.className = 'modal-wrapper';
@@ -95,20 +234,30 @@ const createModal = () => {
 
   const modalTitle = document.createElement('h3');
   modalTitle.className = 'modal-title';
-  modalTitle.textContent = appState.modal.title;
+  modalTitle.textContent = title;
 
   const modalCloseButton = document.createElement('button');
   modalCloseButton.id = 'modal-close';
   modalCloseButton.type = 'button';
   modalCloseButton.className = 'modal-close';
-  modalCloseButton.style.backgroundImage = appState.modal.backgroundImage;
-  modalCloseButton.style.backgroundSize = 'cover';
-  modalCloseButton.style.width = '30px'
-  modalCloseButton.style.height = '30px'
-  modalCloseButton.style.border = '0';
+  modalCloseButton.style.border = '1px solid black';
+  modalCloseButton.style.borderRadius = '5px';
 
+  const modalCloseDivLeft = document.createElement('div');
+  modalCloseDivLeft.id = 'modal-close-div-left';
+  modalCloseDivLeft.classList.add('modal-close-div');
+  modalCloseDivLeft.classList.add('modal-close-div-left');
+
+  const modalCloseDivRiht = document.createElement('div');
+  modalCloseDivRiht.id = 'modal-close-div-right';
+  modalCloseDivRiht.classList.add('modal-close-div');
+  modalCloseDivRiht.classList.add('modal-close-div-right');
+  
   modalHeader.appendChild(modalTitle);
   modalHeader.appendChild(modalCloseButton);
+
+  modalCloseButton.appendChild(modalCloseDivLeft);
+  modalCloseButton.appendChild(modalCloseDivRiht);
 
   const modalForm = document.createElement('form');
   modalForm.className = 'modal-form';
@@ -118,20 +267,21 @@ const createModal = () => {
 
   const emailLabel = document.createElement('label');
   emailLabel.setAttribute('for', 'e-mail');
-  emailLabel.textContent = appState.modal.emailLabel;
+  emailLabel.textContent = emailLabelValue;
 
   const emailInput = document.createElement('input');
   emailInput.name = 'e-mail';
   emailInput.type = 'text';
-  emailInput.id = 'modal-login';
+  emailInput.id = 'modal-email';
 
   const passwordLabel = document.createElement('label');
   passwordLabel.setAttribute('for', 'password');
-  passwordLabel.textContent = appState.modal.passwordLabel;
+  passwordLabel.textContent = passwordLabelValue;
 
   const passwordInput = document.createElement('input');
+  passwordInput.setAttribute('autocomplete', 'on');
   passwordInput.name = 'password';
-  passwordInput.type = 'text';
+  passwordInput.type = 'password';
   passwordInput.id = 'modal-password';
 
   modalMain.appendChild(emailLabel);
@@ -146,7 +296,7 @@ const createModal = () => {
   submitButton.id = 'modal-submit-button';
   submitButton.type = 'submit';
   submitButton.className = 'modal-submit-button';
-  submitButton.textContent = appState.modal.submitButtonText;
+  submitButton.textContent = submitButtonText;
 
   modalFooter.appendChild(submitButton);
 
@@ -157,8 +307,6 @@ const createModal = () => {
   modal.appendChild(modalForm);
 
   modalWrapper.appendChild(modal);
-
-  appState.modal.isModalShown = true;
 
   return modalWrapper;
 }
@@ -176,18 +324,3 @@ const render = () => {
   // document.body.appendChild(modal);
 }
 render();
-
-  
-// ====== СЕРВИС ======
-// fetch(appState.service.baseUrl + appState.service.usersUrl, {
-//   method: 'POST',
-//   body: JSON.stringify({
-//     id: 1,
-//     name: userName,
-//   }),
-//   headers: {
-//     'Content-type': 'application/json; charset=UTF-8',
-//   },
-// })
-//   .then((response) => response.json())
-//   .then((json) => console.log(json));
