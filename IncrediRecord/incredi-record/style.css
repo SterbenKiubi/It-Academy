@@ -54,7 +54,6 @@ main {
   display: flex;
   background-color: brown;
   width: 80%;
-  max-width: 728px;
 }
 
 footer {
@@ -107,7 +106,7 @@ footer {
 		opacity: 1;
 	}
 }
-.modal-close-div {
+.modal-close-icon {
   position: absolute;
   top: 25%;
   left: 45%;
@@ -116,10 +115,10 @@ footer {
   background-color: black;
   border-radius: 10px;
 }
-.modal-close-div-left {
+.modal-close-icon-crosshair-one {
   transform: rotate(45deg);
 }
-.modal-close-div-right {
+.modal-close-icon-crosshair-two {
   transform: rotate(-45deg);
 }
 .modal-form {
@@ -138,4 +137,19 @@ footer {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.alert {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border-radius: 4px;
+  background-color: #dff2bf;
+  color: #4caf50;
+}
+.alert-icon {
+  margin-right: 8px;
 }

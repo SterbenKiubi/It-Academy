@@ -40,6 +40,47 @@ const appState = {
 }
 
 // ====== ФУНКЦИИ ======
+const showSuccessfulAlert = () => {
+  const alertContainer = document.getElementById('alert-container');
+  
+  const alertDiv = document.createElement('div');
+  alertDiv.id = 'alert-div';
+  alertDiv.className = 'alert';
+  
+  const checkIcon = document.createElement('span');
+  checkIcon.className = 'alert-icon';
+  checkIcon.innerHTML = '✔️'; 
+  
+  alertDiv.appendChild(checkIcon);
+  alertDiv.appendChild(document.createTextNode('Here is a gentle confirmation that your action was successful.'));
+  
+  alertContainer.appendChild(alertDiv);
+}
+
+const showErrorAlert = () => {
+  const alertContainer = document.getElementById('alert-container');
+
+  const alertDiv = document.createElement('div');
+  alertDiv.id = 'alert-div';
+  alertDiv.className = 'alert';
+  alertDiv.style.color = 'red';
+
+  const errorIcon = document.createElement('span');
+  errorIcon.className = 'alert-icon';
+  errorIcon.innerHTML = '❌'; 
+
+  alertDiv.appendChild(errorIcon);
+  alertDiv.appendChild(document.createTextNode('You entered your username or password incorrectly. Please try again.'));
+
+  alertContainer.appendChild(alertDiv);
+}
+
+const removeAlert = () => {
+  const alertContainer = document.getElementById('alert-container');
+  const alertDiv = document.getElementById('alert-div')
+
+  alertContainer.removeChild(alertDiv);
+}
 
 
 // ====== СЕРВИСЫ ======
@@ -162,7 +203,10 @@ const signinHandler = async(email, password) => {
 const modalClickHandler = (clickEvent) => {
   const { target: { id } } = clickEvent; 
 
-  if (id === 'modal-close' || id === 'modal-wrapper' || id === 'modal-close-div-left' || id === 'modal-close-div-right') {
+  if (id === 'modal-close' ||
+    id === 'modal-wrapper' ||
+    id === 'modal-close-div-left' ||
+    id === 'modal-close-div-right') {
     closeModal();
   }
 
@@ -186,6 +230,14 @@ const modalClickHandler = (clickEvent) => {
 
     if (modalName === 'signin') {
       signinHandler(email, password);
+    }
+    if(!email || !password) {
+      showErrorAlert();
+      setTimeout(removeAlert, 3000);
+    }
+    if(email && password) {
+      showSuccessfulAlert()
+      setTimeout(removeAlert, 3000);
     }
   }
 }
@@ -244,14 +296,14 @@ const createModal = (config) => {
   modalCloseButton.style.borderRadius = '5px';
 
   const modalCloseDivLeft = document.createElement('div');
-  modalCloseDivLeft.id = 'modal-close-div-left';
-  modalCloseDivLeft.classList.add('modal-close-div');
-  modalCloseDivLeft.classList.add('modal-close-div-left');
+  modalCloseDivLeft.id = 'modal-close-icon-crosshair-one';
+  modalCloseDivLeft.classList.add('modal-close-icon');
+  modalCloseDivLeft.classList.add('modal-close-icon-crosshair-one');
 
   const modalCloseDivRiht = document.createElement('div');
-  modalCloseDivRiht.id = 'modal-close-div-right';
-  modalCloseDivRiht.classList.add('modal-close-div');
-  modalCloseDivRiht.classList.add('modal-close-div-right');
+  modalCloseDivRiht.id = 'modal-close-icon-crosshair-two';
+  modalCloseDivRiht.classList.add('modal-close-icon');
+  modalCloseDivRiht.classList.add('modal-close-icon-crosshair-two');
   
   modalHeader.appendChild(modalTitle);
   modalHeader.appendChild(modalCloseButton);
