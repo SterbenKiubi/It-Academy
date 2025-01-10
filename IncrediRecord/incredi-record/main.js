@@ -3,6 +3,7 @@ const headerTitle = document.getElementById('header-title');
 const footer = document.getElementById('footer');
 const buttonLogin = document.getElementById('button-login');
 const buttonSignin = document.getElementById('button-signin');
+const alertContainer = document.getElementById('alert-container');
 
 // ====== СТЕЙТ ======
 const appState = {
@@ -41,8 +42,6 @@ const appState = {
 
 // ====== ФУНКЦИИ ======
 const showSuccessfulAlert = () => {
-  const alertContainer = document.getElementById('alert-container');
-  
   const alertDiv = document.createElement('div');
   alertDiv.id = 'alert-div';
   alertDiv.className = 'alert';
@@ -58,8 +57,6 @@ const showSuccessfulAlert = () => {
 }
 
 const showErrorAlert = () => {
-  const alertContainer = document.getElementById('alert-container');
-
   const alertDiv = document.createElement('div');
   alertDiv.id = 'alert-div';
   alertDiv.className = 'alert';
@@ -76,7 +73,6 @@ const showErrorAlert = () => {
 }
 
 const removeAlert = () => {
-  const alertContainer = document.getElementById('alert-container');
   const alertDiv = document.getElementById('alert-div')
 
   alertContainer.removeChild(alertDiv);
