@@ -3,7 +3,7 @@ const headerTitle = document.getElementById('header-title');
 const footer = document.getElementById('footer');
 const buttonLogin = document.getElementById('button-login');
 const buttonSignin = document.getElementById('button-signin');
-const alertContainer = document.getElementById('alert-container');
+const contentWrapper = document.getElementById('content-wrapper');
 
 // ====== СТЕЙТ ======
 const appState = {
@@ -38,44 +38,82 @@ const appState = {
   user: undefined,
   error: '',
   isLoading: false,
+  loadingMessage: 'Loading...',
 }
 
 // ====== ФУНКЦИИ ======
-const showSuccessfulAlert = () => {
-  const alertDiv = document.createElement('div');
-  alertDiv.id = 'alert-div';
-  alertDiv.className = 'alert';
-  
-  const checkIcon = document.createElement('span');
-  checkIcon.className = 'alert-icon';
-  checkIcon.innerHTML = '✔️'; 
-  
-  alertDiv.appendChild(checkIcon);
-  alertDiv.appendChild(document.createTextNode('Here is a gentle confirmation that your action was successful.'));
-  
-  alertContainer.appendChild(alertDiv);
-}
+// error, info, seccess
+const createAlert = (type, message) => {
+  let icon;
+  let color;
 
-const showErrorAlert = () => {
+  switch (type) {
+    case 'success':
+      icon = '✔️';
+      break;
+    case 'info': {
+      icon = '(i)'
+      color = 'blue'
+    }
+      break;
+    case 'error': {
+      icon = '❌'
+      color = 'red'
+    }
+      break;
+    default: {
+      icon = ''
+      color = 'grey'
+    }
+  }
+
   const alertDiv = document.createElement('div');
   alertDiv.id = 'alert-div';
   alertDiv.className = 'alert';
-  alertDiv.style.color = 'red';
+  alertDiv.style.color = color;
 
   const errorIcon = document.createElement('span');
   errorIcon.className = 'alert-icon';
-  errorIcon.innerHTML = '❌'; 
+  errorIcon.innerHTML = icon;
 
   alertDiv.appendChild(errorIcon);
-  alertDiv.appendChild(document.createTextNode('You entered your username or password incorrectly. Please try again.'));
+  alertDiv.appendChild(document.createTextNode(message));
 
-  alertContainer.appendChild(alertDiv);
+  return alertDiv;
 }
 
-const removeAlert = () => {
-  const alertDiv = document.getElementById('alert-div')
+const showSuccessAlert = (message) => {
+  const alert = createAlert('success', message);
+  
+  document.body.appendChild(alert);
+}
 
-  alertContainer.removeChild(alertDiv);
+const showErrorAlert = (message) => {
+  const alert = createAlert('error', message);
+  
+  document.body.appendChild(alert);
+}
+
+const removeAlert = (time) => {
+  setTimeout(() => {
+    const alertDiv = document.getElementById('alert-div');
+    document.body.removeChild(alertDiv);
+  }, time);
+};
+
+const createSpinner = () => {
+  const spinner = document.createElement('div');
+  spinner.style.position = 'absolute';
+  spinner.style.left = '45%'
+  spinner.style.top = '70%'
+  spinner.id = 'spinner';
+  spinner.classList.add('spinner');
+  
+  contentWrapper.appendChild(spinner)
+}
+const removeSpinner = () => {
+  const spinner = document.getElementById('spinner')
+  contentWrapper.removeChild(spinner)
 }
 
 
@@ -150,10 +188,11 @@ const closeModal = () => {
 const loginHandler = async (email, password) => {
   try {
     appState.isLoading = true;
+    console.log(appState.loadingMessage);
+    createSpinner()
     const usersFromDB = await userService.getUsers();
     const usersFromLS = userLocalService.getUsers();
     const users = [...usersFromDB, ...usersFromLS];
-    console.log(users);
 
     const user = users.find((user) => {
       return user.email === email && user.address.zipcode === password;
@@ -162,38 +201,51 @@ const loginHandler = async (email, password) => {
     if (user) {
       appState.user = user;
       appState.error = '';
+
+      showSuccessAlert('Login Success');
     } else {
       throw new Error('Invalid email or password');
     }
   } catch (err) {
     console.error(err);
     appState.error = err.message;
+
+    showErrorAlert(err.message);
   } finally {
     appState.isLoading = false;
+    removeSpinner()
     
     closeModal();
+    removeAlert(5000);
   }
 };
 
 const signinHandler = async(email, password) => {
   try {
     appState.isLoading = true;
+    createSpinner();
     const user = await userService.postUser(email, password);
 
     if (user) {
       userLocalService.postUser(user);
       appState.user = user;
       appState.error = '';
+
+      showSuccessAlert('User created successfully');
     } else {
       throw new Error('User was not craeted');
     }
   } catch (err) {
     console.error(err);
     appState.error = err.message;
+
+    showErrorAlert(err.message);
   } finally {
     appState.isLoading = false;
+    removeSpinner()
 
     closeModal();
+    removeAlert(5000);
   }
 }
 const modalClickHandler = (clickEvent) => {
@@ -226,14 +278,6 @@ const modalClickHandler = (clickEvent) => {
 
     if (modalName === 'signin') {
       signinHandler(email, password);
-    }
-    if(!email || !password) {
-      showErrorAlert();
-      setTimeout(removeAlert, 3000);
-    }
-    if(email && password) {
-      showSuccessfulAlert()
-      setTimeout(removeAlert, 3000);
     }
   }
 }
@@ -367,8 +411,66 @@ const render = () => {
   buttonSignin.innerHTML = appState.header.signIn;
 
   footer.innerHTML = appState.footer.author;
-
-  // const modal = createModal();
-  // document.body.appendChild(modal);
 }
 render();
+
+window.addEventListener('load', () => {
+  let selectedRecord = null;
+  let offsetX = 0;
+  let offsetY = 0;
+  let zIndex = 1;
+
+  const fillingRecords = document.querySelectorAll('.filling-record');
+
+  const recordsLeftPositions = [];
+  const recordsTopPositions = [];
+
+  fillingRecords.forEach(record => {
+    recordsLeftPositions.push(record.getBoundingClientRect().left);
+    recordsTopPositions.push(record.getBoundingClientRect().top);
+  })
+
+  fillingRecords.forEach((record, index) => {
+    record.style.position = 'absolute';
+
+    record.style.left = `${recordsLeftPositions[index]}px`;
+    record.style.top = `${recordsTopPositions[index]-50}px`;
+
+    
+    record.addEventListener('mousedown', (e) => {
+      event.preventDefault();
+      selectedRecord = record;
+
+      zIndex += 1;
+      selectedRecord.style.zIndex = zIndex;
+
+      offsetX = e.clientX - record.getBoundingClientRect().left;
+      offsetY = e.clientY - record.getBoundingClientRect().top;
+
+      document.body.style.cursor = 'grab';
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    });
+  });
+
+  function onMouseMove(e) {
+    event.preventDefault();
+    if(selectedRecord) {
+      selectedRecord.style.left = (e.clientX - offsetX) + 'px';
+      selectedRecord.style.top = (e.clientY - offsetY) + 'px';
+    }
+  }
+
+  function onMouseUp() {
+    event.preventDefault();
+    if(selectedRecord) {
+      selectedRecord = null;
+      document.body.style.cursor = 'default';
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    }
+  }
+
+})
+
+
