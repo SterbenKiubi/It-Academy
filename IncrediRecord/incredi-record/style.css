@@ -168,6 +168,9 @@ footer {
   border-radius: 50%;
   animation: spin 1.3s ease infinite;
 }
+.spin-around {
+  animation: spin 1.3s ease infinite;
+}
 @keyframes spin {
   to {
     transform: rotate(360deg);

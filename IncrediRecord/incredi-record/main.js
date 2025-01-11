@@ -110,9 +110,45 @@ const createSpinner = () => {
   
   contentWrapper.appendChild(spinner)
 }
+
 const removeSpinner = () => {
   const spinner = document.getElementById('spinner')
   contentWrapper.removeChild(spinner)
+}
+
+const replaceEmptyRecordOneToFillingRecord = (src) => {
+  const emmpyRecordOne = document.getElementById('empty-record-one');
+
+  emmpyRecordOne.src = src;
+  emmpyRecordOne.classList.add('spin-around')
+}
+
+const replaceEmptyRecordTwoToFillingRecord = (src) => {
+  const emmpyRecordTwo = document.getElementById('empty-record-two');
+
+  emmpyRecordTwo.src = src;
+  emmpyRecordTwo.classList.add('spin-around')
+}
+
+const replaceEmptyRecordThreeToFillingRecord = (src) => {
+  const emmpyRecordThree = document.getElementById('empty-record-three');
+
+  emmpyRecordThree.src = src;
+  emmpyRecordThree.classList.add('spin-around')
+}
+
+const replaceEmptyRecordFourToFillingRecord = (src) => {
+  const emmpyRecordFour = document.getElementById('empty-record-four');
+
+  emmpyRecordFour.src = src;
+  emmpyRecordFour.classList.add('spin-around')
+}
+
+const replaceEmptyRecordFiveToFillingRecord = (src) => {
+  const emmpyRecordFive = document.getElementById('empty-record-five');
+
+  emmpyRecordFive.src = src;
+  emmpyRecordFive.classList.add('spin-around')
 }
 
 
@@ -414,6 +450,11 @@ const render = () => {
 render();
 
 window.addEventListener('load', () => {
+  const emptyRecordOne = document.getElementById('empty-record-one');
+  const emptyRecordTwo = document.getElementById('empty-record-two');
+  const emptyRecordThree = document.getElementById('empty-record-three');
+  const emptyRecordFour = document.getElementById('empty-record-four');
+  const emptyRecordFive = document.getElementById('empty-record-five');
   let selectedRecord = null;
   let offsetX = 0;
   let offsetY = 0;
@@ -462,9 +503,88 @@ window.addEventListener('load', () => {
 
   function onMouseUp() {
     event.preventDefault();
+    let selectedRecordSrc = selectedRecord.src;
+    
+    
     if(selectedRecord) {
-      selectedRecord = null;
+      
       document.body.style.cursor = 'default';
+      const selectedRecordTop = selectedRecord.getBoundingClientRect().top;
+      const selectedRecordRight = selectedRecord.getBoundingClientRect().right;
+      const selectedRecordBottom = selectedRecord.getBoundingClientRect().bottom;
+      const selectedRecordLeft = selectedRecord.getBoundingClientRect().left;
+      
+      const emptyRecordOneTop = emptyRecordOne.getBoundingClientRect().top;
+      const emptyRecordOneRight = emptyRecordOne.getBoundingClientRect().right;
+      const emptyRecordOneBottom = emptyRecordOne.getBoundingClientRect().bottom;
+      const emptyRecordOneLeft = emptyRecordOne.getBoundingClientRect().left;
+
+      const emptyRecordTwoTop = emptyRecordTwo.getBoundingClientRect().top;
+      const emptyRecordTwoRight = emptyRecordTwo.getBoundingClientRect().right;
+      const emptyRecordTwoBottom = emptyRecordTwo.getBoundingClientRect().bottom;
+      const emptyRecordTwoLeft = emptyRecordTwo.getBoundingClientRect().left;
+
+      const emptyRecordThreeTop = emptyRecordThree.getBoundingClientRect().top;
+      const emptyRecordThreeRight = emptyRecordThree.getBoundingClientRect().right;
+      const emptyRecordThreeBottom = emptyRecordThree.getBoundingClientRect().bottom;
+      const emptyRecordThreeLeft = emptyRecordThree.getBoundingClientRect().left;
+
+      const emptyRecordFourTop = emptyRecordFour.getBoundingClientRect().top;
+      const emptyRecordFourRight = emptyRecordFour.getBoundingClientRect().right;
+      const emptyRecordFourBottom = emptyRecordFour.getBoundingClientRect().bottom;
+      const emptyRecordFourLeft = emptyRecordFour.getBoundingClientRect().left;
+
+      const emptyRecordFiveTop = emptyRecordFive.getBoundingClientRect().top;
+      const emptyRecordFiveRight = emptyRecordFive.getBoundingClientRect().right;
+      const emptyRecordFiveBottom = emptyRecordFive.getBoundingClientRect().bottom;
+      const emptyRecordFiveLeft = emptyRecordFive.getBoundingClientRect().left;
+
+      console.log(selectedRecordLeft);
+      console.log(emptyRecordOneLeft);
+      console.log(selectedRecordSrc);
+      
+      
+      
+      if(selectedRecordTop >= emptyRecordOneTop &&
+        selectedRecordRight <= emptyRecordOneRight &&
+        selectedRecordBottom <= emptyRecordOneBottom &&
+        selectedRecordLeft >= emptyRecordOneLeft
+        ) {
+        replaceEmptyRecordOneToFillingRecord(selectedRecordSrc)
+      }
+
+      if(selectedRecordTop >= emptyRecordTwoTop &&
+        selectedRecordRight <= emptyRecordTwoRight &&
+        selectedRecordBottom <= emptyRecordTwoBottom &&
+        selectedRecordLeft >= emptyRecordTwoLeft
+        ) {
+          replaceEmptyRecordTwoToFillingRecord(selectedRecordSrc)
+      }
+
+      if(selectedRecordTop >= emptyRecordThreeTop &&
+        selectedRecordRight <= emptyRecordThreeRight &&
+        selectedRecordBottom <= emptyRecordThreeBottom &&
+        selectedRecordLeft >= emptyRecordThreeLeft
+        ) {
+          replaceEmptyRecordThreeToFillingRecord(selectedRecordSrc)
+      }
+
+      if(selectedRecordTop >= emptyRecordFourTop &&
+        selectedRecordRight <= emptyRecordFourRight &&
+        selectedRecordBottom <= emptyRecordFourBottom &&
+        selectedRecordLeft >= emptyRecordFourLeft
+        ) {
+          replaceEmptyRecordFourToFillingRecord(selectedRecordSrc)
+      }
+
+      if(selectedRecordTop >= emptyRecordFiveTop &&
+        selectedRecordRight <= emptyRecordFiveRight &&
+        selectedRecordBottom <= emptyRecordFiveBottom &&
+        selectedRecordLeft >= emptyRecordFiveLeft
+        ) {
+          replaceEmptyRecordFiveToFillingRecord(selectedRecordSrc)
+      }
+      
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
     }
