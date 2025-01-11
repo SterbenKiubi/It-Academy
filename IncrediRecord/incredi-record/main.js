@@ -42,7 +42,6 @@ const appState = {
 }
 
 // ====== ФУНКЦИИ ======
-// error, info, seccess
 const createAlert = (type, message) => {
   let icon;
   let color;
