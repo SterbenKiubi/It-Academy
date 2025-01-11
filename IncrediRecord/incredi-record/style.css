@@ -41,7 +41,7 @@ main {
   flex-direction: column;
   gap: 40%;
   align-items: center;
-  background-image: url(/img/game-bck-hd.jpg);
+  background-image: url(../img/game-bck-hd.jpg);
   background-size: cover;
   width: 80%;
   border-radius: 10px;
