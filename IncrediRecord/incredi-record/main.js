@@ -2,24 +2,24 @@
 const defaultUser = {
   email: "unknow-user@js.com",
   address: {
-      "zipcode": "unknow-user123456"
+    "zipcode": "unknow-user123456",
   },
 };
 
 const defaultPlayer = {
   sockets: [
-    { type: 'socket', picSrc: '../img/empty-record.png', soundSrc: '', disabled: true },
-    { type: 'socket', picSrc: '../img/empty-record.png', soundSrc: '', disabled: true },
-    { type: 'socket', picSrc: '../img/empty-record.png', soundSrc: '', disabled: true },
-    { type: 'socket', picSrc: '../img/empty-record.png', soundSrc: '', disabled: true },
-    { type: 'socket', picSrc: '../img/empty-record.png', soundSrc: '', disabled: true },
+    { type: 'socket', picSrc: '../img/empty-record.png' },
+    { type: 'socket', picSrc: '../img/empty-record.png' },
+    { type: 'socket', picSrc: '../img/empty-record.png' },
+    { type: 'socket', picSrc: '../img/empty-record.png' },
+    { type: 'socket', picSrc: '../img/empty-record.png' },
   ],
   samples: [
-    { type: 'sample', picSrc: '../img/record-red.png', soundSrc: '', disabled: true },
-    { type: 'sample', picSrc: '../img/record-orange.png', soundSrc: '', disabled: true },
-    { type: 'sample', picSrc: '../img/record-yellow.png', soundSrc: '', disabled: true },
-    { type: 'sample', picSrc: '../img/record-multicolored.png', soundSrc: '', disabled: true },
-    { type: 'sample', picSrc: '../img/record-gray.png', soundSrc: '', disabled: true },
+    { type: 'sample', picSrc: '../img/record-red.png', soundSrc: '../samples/1_lead_a.mp3' },
+    { type: 'sample', picSrc: '../img/record-orange.png', soundSrc: '../samples/2_deux_a.mp3' },
+    { type: 'sample', picSrc: '../img/record-yellow.png', soundSrc: '../samples/3_kosh_a.mp3' },
+    { type: 'sample', picSrc: '../img/record-multicolored.png', soundSrc: '../samples/4_shpok_a.mp3' },
+    { type: 'sample', picSrc: '../img/record-gray.png', soundSrc: '../samples/5_tom_a.mp3' },
   ],
 };
 
@@ -38,11 +38,7 @@ const deepClone = (obj) => {
   }
 
   return clone;
-}
-
-const getIndexFromId = (id) => {
-  return +id.split('-')[1]
-}
+};
 
 // ====== ЭДЕМЕНТЫ ======
 const headerTitle = document.getElementById('header-title');
@@ -262,7 +258,7 @@ const userLocalService = {
   },
   loadPlayer: () => {
     const playerJSON = localStorage.getItem(appState.user.email);
-    const player = JSON.parse(playerJSON) || defaultPlayer;
+    const player = JSON.parse(playerJSON) || deepClone(defaultPlayer);
 
     return player;
   },
@@ -272,10 +268,10 @@ const userLocalService = {
   },
   getUser: () => {
     const userJSON = sessionStorage.getItem('user');
-    const user = JSON.parse(userJSON) || defaultUser;
+    const user = JSON.parse(userJSON) || deepClone(defaultUser);
 
     return user;
-  }
+  },
 }
 
 const closeModal = () => {
@@ -341,6 +337,7 @@ const signinHandler = async (email, password) => {
 
     appState.isLoading = true;
     showSpinner();
+
     const user = await userService.postUser(email, password);
 
     if (user) {
@@ -348,7 +345,8 @@ const signinHandler = async (email, password) => {
       userLocalService.postUser(user);
       appState.user = user;
       appState.error = '';
-      appState.player = defaultPlayer;
+      appState.player = deepClone(defaultPlayer);
+      userLocalService.savePlayer(appState.player);
 
       render();
 
@@ -585,37 +583,60 @@ const addSamles = () => {
     samplesWrapper.appendChild(element);
   });
 };
+
+const createAudio = (src) => {
+  const audio = document.createElement('audio');
+
+  audio.setAttribute('autoplay', '');
+  audio.setAttribute('loop', '');
+
+  const source = document.createElement('source');
+  source.setAttribute('src', src);
+  source.setAttribute('type', 'audio/mp3');
+
+  audio.appendChild(source);
+
+  return audio;
+};
+
+const playAudio = () => {
+  const audioElements = document.getElementsByTagName('audio');
+  Array.from(audioElements).forEach((element) => {
+    document.body.removeChild(element);
+  });
+
+  appState.player.sockets.forEach((socket) => {
+    if (socket.type === 'sample') {
+      const audio = createAudio(socket.soundSrc);
+
+      document.body.appendChild(audio);
+    }
+  });
+};
+
+const spinReconds = () => {
+  const sockets = document.getElementById('sockets-wrapper').children;
+  const samples = document.getElementById('samples-wrapper').children;
   
-// ====== РЕНДЕР ======
-function render() {
-  const user = userLocalService.getUser();
-  appState.user = user;
-  const player = userLocalService.loadPlayer();
-  appState.player = player;
+  Array.from(sockets).forEach((socket) => {
+    if (socket.hasAttribute('sample')) {
+      socket.classList.add('spin-around');
+    }
+  });
+  Array.from(samples).forEach((sample) => {
+    if (sample.hasAttribute('sample')) {
+      sample.classList.remove('spin-around');
+    }
+  });
+};
 
-  headerTitle.innerHTML = appState.header.title;
-  buttonLogin.innerHTML = appState.header.logIn;
-  buttonSignin.innerHTML = appState.header.signIn;
-
-  footer.innerHTML = appState.footer.author;
-
-  addSockets();
-  addSamles();
-
-  console.log(appState);
-}
-render();
-
-// DRAG AND DROP
-const sockets = document.querySelectorAll('[socket]');
-const samples = document.querySelectorAll('[sample]');
-
+// ====== DRAG AND DROP ======
 const switchSampleAndSocket = (sample, socket) => {
-  const sampleIdx = getIndexFromId(sample.id);
-  const sockedIdx = getIndexFromId(socket.id);
-
   const sampleParent = sample.parentNode;
   const socketParent = socket.parentNode;
+
+  const sampleIndex = Array.from(sampleParent.children).findIndex((child) => child.id === sample.id);
+  const socketIndex = Array.from(socketParent.children).findIndex((child) => child.id === socket.id);
 
   let samplesArray;
   let socketsArray;
@@ -630,14 +651,11 @@ const switchSampleAndSocket = (sample, socket) => {
     socketsArray = appState.player.sockets;
   }
 
-  const temp = samplesArray[sampleIdx];
-  samplesArray[sampleIdx] = socketsArray[sockedIdx];
-  socketsArray[sockedIdx] = temp;
+  const temp = samplesArray[sampleIndex];
+  samplesArray[sampleIndex] = socketsArray[socketIndex];
+  socketsArray[socketIndex] = temp;
 
-  const sampleIndex = Array.from(sampleParent.children).findIndex((child) => child.id === sample.id);
   const nextSample = sampleParent.children[sampleIndex + 1];
-
-  const socketIndex = Array.from(socketParent.children).findIndex((child) => child.id === socket.id);
   const nextSocket = socketParent.children[socketIndex + 1];
 
   if (nextSocket) {
@@ -658,7 +676,7 @@ let currentPicSrc;
 const dragStart = (dragStartEvent) => {
   dragStartEvent.dataTransfer.setData('sample-id', dragStartEvent.target.id);
   currentPicSrc = dragStartEvent.target.src;
-  dragStartEvent.target.src = '/img/empty-record.png';
+  dragStartEvent.target.src = '../img/empty-record.png';
 };
 
 const dragEnd = (dragEndEvent) => {
@@ -679,6 +697,9 @@ const dragDrop = (dragDropEvent) => {
 
   switchSampleAndSocket(sample, socket);
   userLocalService.savePlayer(appState.player);
+
+  playAudio();
+  spinReconds();
 };
 
 let touchedSample;
@@ -687,7 +708,7 @@ let touchedSampleClone;
 const touchStart = (event) => {
   touchedSample = event.target;
   touchedSampleClone = touchedSample.cloneNode(false);
-  touchedSample.src = '/img/empty-record.png';
+  touchedSample.src = '../img/empty-record.png';
   touchedSampleClone.style.position = 'absolute';
   document.body.appendChild(touchedSampleClone);
 };
@@ -708,17 +729,48 @@ const touchEnd = (event) => {
   if (targetSocket.id.includes('socket')) {
     switchSampleAndSocket(touchedSample, targetSocket);
     userLocalService.savePlayer(appState.player);
+
+    playAudio();
+    spinReconds();
   }
 };
 
-sockets.forEach((socket) => {
-  socket.addEventListener('dragover', dragOver);
-  socket.addEventListener('drop', dragDrop);
-});
-samples.forEach((sample) => {
-  sample.addEventListener('dragstart', dragStart);
-  sample.addEventListener('dragend', dragEnd);
-  sample.addEventListener('touchstart', touchStart);
-  sample.addEventListener('touchmove', touchMove);
-  sample.addEventListener('touchend', touchEnd);
-});
+const addPlayerListeners = () => {
+  const sockets = document.querySelectorAll('[socket]');
+  const samples = document.querySelectorAll('[sample]');
+
+  sockets.forEach((socket) => {
+    socket.addEventListener('dragover', dragOver);
+    socket.addEventListener('drop', dragDrop);
+  });
+
+  samples.forEach((sample) => {
+    sample.addEventListener('dragstart', dragStart);
+    sample.addEventListener('dragend', dragEnd);
+    sample.addEventListener('touchstart', touchStart);
+    sample.addEventListener('touchmove', touchMove);
+    sample.addEventListener('touchend', touchEnd);
+  });
+};
+  
+// ====== РЕНДЕР ======
+function render() {
+  const user = userLocalService.getUser();
+  appState.user = user;
+  const player = userLocalService.loadPlayer();
+  appState.player = player;
+
+  headerTitle.innerHTML = appState.header.title;
+  buttonLogin.innerHTML = appState.header.logIn;
+  buttonSignin.innerHTML = appState.header.signIn;
+
+  footer.innerHTML = appState.footer.author;
+
+  addSockets();
+  addSamles();
+  addPlayerListeners();
+
+  playAudio();
+  spinReconds();
+}
+render();
