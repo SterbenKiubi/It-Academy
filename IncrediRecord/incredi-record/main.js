@@ -1,3 +1,49 @@
+// Defaults
+const defaultUser = {
+  email: "unknow-user@js.com",
+  address: {
+      "zipcode": "unknow-user123456"
+  },
+};
+
+const defaultPlayer = {
+  sockets: [
+    { type: 'socket', picSrc: '../img/empty-record.png', soundSrc: '', disabled: true },
+    { type: 'socket', picSrc: '../img/empty-record.png', soundSrc: '', disabled: true },
+    { type: 'socket', picSrc: '../img/empty-record.png', soundSrc: '', disabled: true },
+    { type: 'socket', picSrc: '../img/empty-record.png', soundSrc: '', disabled: true },
+    { type: 'socket', picSrc: '../img/empty-record.png', soundSrc: '', disabled: true },
+  ],
+  samples: [
+    { type: 'sample', picSrc: '../img/record-red.png', soundSrc: '', disabled: true },
+    { type: 'sample', picSrc: '../img/record-orange.png', soundSrc: '', disabled: true },
+    { type: 'sample', picSrc: '../img/record-yellow.png', soundSrc: '', disabled: true },
+    { type: 'sample', picSrc: '../img/record-multicolored.png', soundSrc: '', disabled: true },
+    { type: 'sample', picSrc: '../img/record-gray.png', soundSrc: '', disabled: true },
+  ],
+};
+
+// ====== УТИЛИТЫ =======
+const deepClone = (obj) => {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+
+  const clone = Array.isArray(obj) ? [] : {};
+
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      clone[key] = deepClone(obj[key]);
+    }
+  }
+
+  return clone;
+}
+
+const getIndexFromId = (id) => {
+  return +id.split('-')[1]
+}
+
 // ====== ЭДЕМЕНТЫ ======
 const headerTitle = document.getElementById('header-title');
 const footer = document.getElementById('footer');
@@ -39,6 +85,7 @@ const appState = {
   error: '',
   isLoading: false,
   loadingMessage: 'Loading...',
+  player: deepClone(defaultPlayer),
 }
 
 // ====== ФУНКЦИИ ======
@@ -95,60 +142,65 @@ const showErrorAlert = (message) => {
 
 const removeAlert = (time) => {
   setTimeout(() => {
-    const alertDiv = document.getElementById('alert-div');
-    document.body.removeChild(alertDiv);
+    const alert = document.getElementById('alert-div');
+    if (alert) {
+      document.body.removeChild(alert);
+    }
   }, time);
 };
 
+const loadingHandler = (event) => {
+  const spinner = document.getElementById('spinner');
+  spinner.style.left = `${event.clientX - 15}px`;
+  spinner.style.top = `${event.clientY - 10}px`;
+};
+
 const createSpinner = () => {
+  const spinnerWrapper = document.createElement('div');
+  spinnerWrapper.className = 'spinner-wrapper';
+  spinnerWrapper.id = 'spinner-wrapper';
+
   const spinner = document.createElement('div');
   spinner.style.position = 'absolute';
-  spinner.style.left = '45%'
-  spinner.style.top = '70%'
+  spinner.style.left = '45%';
+  spinner.style.top =  '50%';
   spinner.id = 'spinner';
   spinner.classList.add('spinner');
+
+  spinnerWrapper.appendChild(spinner);
+
+  return spinnerWrapper;
+};
+
+const showSpinner = () => {
+  const spinner = createSpinner();
+
+  document.body.appendChild(spinner);
   
-  contentWrapper.appendChild(spinner)
-}
+  document.body.addEventListener('mousemove', loadingHandler);
+};
 
 const removeSpinner = () => {
-  const spinner = document.getElementById('spinner')
-  contentWrapper.removeChild(spinner)
-}
+  const spinner = document.getElementById('spinner-wrapper');
 
-const replaceEmptyRecordOneToFillingRecord = (src) => {
-  const emmpyRecordOne = document.getElementById('empty-record-one');
+  if (spinner) {
+    document.body.removeChild(spinner);
+  }
 
-  emmpyRecordOne.src = src;
-  emmpyRecordOne.classList.add('spin-around')
-}
+  document.body.removeEventListener('mousemove', loadingHandler);
+};
 
-const replaceEmptyRecordTwoToFillingRecord = (src) => {
-  const emmpyRecordTwo = document.getElementById('empty-record-two');
+const validate = (email, password) => {
+  const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
 
-  emmpyRecordTwo.src = src;
-  emmpyRecordTwo.classList.add('spin-around')
-}
+  if (!emailRegex.test(email)) {
+    throw new Error('Incorrect email format. Please try again with correct email');
+  }
 
-const replaceEmptyRecordThreeToFillingRecord = (src) => {
-  const emmpyRecordThree = document.getElementById('empty-record-three');
-
-  emmpyRecordThree.src = src;
-  emmpyRecordThree.classList.add('spin-around')
-}
-
-const replaceEmptyRecordFourToFillingRecord = (src) => {
-  const emmpyRecordFour = document.getElementById('empty-record-four');
-
-  emmpyRecordFour.src = src;
-  emmpyRecordFour.classList.add('spin-around')
-}
-
-const replaceEmptyRecordFiveToFillingRecord = (src) => {
-  const emmpyRecordFive = document.getElementById('empty-record-five');
-
-  emmpyRecordFive.src = src;
-  emmpyRecordFive.classList.add('spin-around')
+  if (!passwordRegex.test(password)) {
+    throw new Error('Incorrect password format. Please try again with correct password format');
+  }
 }
 
 
@@ -203,6 +255,26 @@ const userLocalService = {
     const existedUsers = JSON.parse(usersFromLS) || [];
 
     return existedUsers;
+  },
+  savePlayer: (player) => {
+    const playerJSON = JSON.stringify(player);
+    localStorage.setItem(appState.user.email, playerJSON);
+  },
+  loadPlayer: () => {
+    const playerJSON = localStorage.getItem(appState.user.email);
+    const player = JSON.parse(playerJSON) || defaultPlayer;
+
+    return player;
+  },
+  saveUser: (user) => {
+    const userJSON = JSON.stringify(user);
+    sessionStorage.setItem('user', userJSON);
+  },
+  getUser: () => {
+    const userJSON = sessionStorage.getItem('user');
+    const user = JSON.parse(userJSON) || defaultUser;
+
+    return user;
   }
 }
 
@@ -222,9 +294,10 @@ const closeModal = () => {
 // ====== ОБРАБОТЧИКИ ======
 const loginHandler = async (email, password) => {
   try {
+    validate(email, password);
+
     appState.isLoading = true;
-    console.log(appState.loadingMessage);
-    createSpinner()
+    showSpinner();
     const usersFromDB = await userService.getUsers();
     const usersFromLS = userLocalService.getUsers();
     const users = [...usersFromDB, ...usersFromLS];
@@ -234,13 +307,21 @@ const loginHandler = async (email, password) => {
     });
 
     if (user) {
+      userLocalService.saveUser(user);
+      const player = userLocalService.loadPlayer();
+
       appState.user = user;
       appState.error = '';
+      appState.player = player;
+
+      render();
 
       showSuccessAlert('Login Success');
     } else {
       throw new Error('Invalid email or password');
     }
+
+    closeModal();
   } catch (err) {
     console.error(err);
     appState.error = err.message;
@@ -248,28 +329,35 @@ const loginHandler = async (email, password) => {
     showErrorAlert(err.message);
   } finally {
     appState.isLoading = false;
-    removeSpinner()
+    removeSpinner();
     
-    closeModal();
     removeAlert(5000);
   }
 };
 
-const signinHandler = async(email, password) => {
+const signinHandler = async (email, password) => {
   try {
+    validate(email, password);
+
     appState.isLoading = true;
-    createSpinner();
+    showSpinner();
     const user = await userService.postUser(email, password);
 
     if (user) {
+      userLocalService.saveUser(user);
       userLocalService.postUser(user);
       appState.user = user;
       appState.error = '';
+      appState.player = defaultPlayer;
+
+      render();
 
       showSuccessAlert('User created successfully');
     } else {
       throw new Error('User was not craeted');
     }
+
+    closeModal();
   } catch (err) {
     console.error(err);
     appState.error = err.message;
@@ -277,19 +365,15 @@ const signinHandler = async(email, password) => {
     showErrorAlert(err.message);
   } finally {
     appState.isLoading = false;
-    removeSpinner()
+    removeSpinner();
 
-    closeModal();
     removeAlert(5000);
   }
 }
 const modalClickHandler = (clickEvent) => {
-  const { target: { id } } = clickEvent; 
+  const { target: { id } } = clickEvent;
 
-  if (id === 'modal-close' ||
-    id === 'modal-wrapper' ||
-    id === 'modal-close-div-left' ||
-    id === 'modal-close-div-right') {
+  if (clickEvent.target.closest('#modal-close')) {
     closeModal();
   }
 
@@ -436,160 +520,205 @@ const createModal = (config) => {
   modalWrapper.appendChild(modal);
 
   return modalWrapper;
-}
+};
 
+const createSocket = (socketConfig, id) => {
+  const { picSrc, type } = socketConfig;
+
+  const imgElement = document.createElement('img');
+
+  imgElement.id = `${type}-${id}`;
+  imgElement.className = 'empty-socket';
+  imgElement.src = picSrc;
+  imgElement.alt = `socket-${id}`;
+  imgElement.setAttribute(type, '');
+
+  return imgElement;
+};
+
+const addSockets = () => {
+  const socketsWrapper = document.getElementById('sockets-wrapper');
+  socketsWrapper.innerHTML = '';
+
+  appState.player.sockets.forEach((config, index) => {
+    let element;
+
+    if (config.type === 'socket') {
+      element = createSocket(config, index);
+    }
+    if (config.type === 'sample') {
+      element = createSample(config, index);
+    }
+
+    socketsWrapper.appendChild(element);
+  });
+};
+
+const createSample = (sampleConfig, id) => {
+  const { picSrc, type } = sampleConfig;
+
+  const imgElement = document.createElement('img');
+
+  imgElement.id = `${type}-${id}`;
+  imgElement.className = 'sample';
+  imgElement.src = picSrc;
+  imgElement.alt = `sample-${id}`;
+  imgElement.setAttribute(type, '');
+
+  return imgElement;
+};
+
+const addSamles = () => {
+  const samplesWrapper = document.getElementById('samples-wrapper');
+  samplesWrapper.innerHTML = '';
+
+  appState.player.samples.forEach((config, index) => {
+    let element;
+
+    if (config.type === 'socket') {
+      element = createSocket(config, index);
+    }
+    if (config.type === 'sample') {
+      element = createSample(config, index);
+    }
+
+    samplesWrapper.appendChild(element);
+  });
+};
   
 // ====== РЕНДЕР ======
-const render = () => {
+function render() {
+  const user = userLocalService.getUser();
+  appState.user = user;
+  const player = userLocalService.loadPlayer();
+  appState.player = player;
+
   headerTitle.innerHTML = appState.header.title;
   buttonLogin.innerHTML = appState.header.logIn;
   buttonSignin.innerHTML = appState.header.signIn;
 
   footer.innerHTML = appState.footer.author;
+
+  addSockets();
+  addSamles();
+
+  console.log(appState);
 }
 render();
 
-window.addEventListener('load', () => {
-  const emptyRecordOne = document.getElementById('empty-record-one');
-  const emptyRecordTwo = document.getElementById('empty-record-two');
-  const emptyRecordThree = document.getElementById('empty-record-three');
-  const emptyRecordFour = document.getElementById('empty-record-four');
-  const emptyRecordFive = document.getElementById('empty-record-five');
-  let selectedRecord = null;
-  let offsetX = 0;
-  let offsetY = 0;
-  let zIndex = 1;
+// DRAG AND DROP
+const sockets = document.querySelectorAll('[socket]');
+const samples = document.querySelectorAll('[sample]');
 
-  const fillingRecords = document.querySelectorAll('.filling-record');
+const switchSampleAndSocket = (sample, socket) => {
+  const sampleIdx = getIndexFromId(sample.id);
+  const sockedIdx = getIndexFromId(socket.id);
 
-  const recordsLeftPositions = [];
-  const recordsTopPositions = [];
+  const sampleParent = sample.parentNode;
+  const socketParent = socket.parentNode;
 
-  fillingRecords.forEach(record => {
-    recordsLeftPositions.push(record.getBoundingClientRect().left);
-    recordsTopPositions.push(record.getBoundingClientRect().top);
-  })
-
-  fillingRecords.forEach((record, index) => {
-    record.style.position = 'absolute';
-
-    record.style.left = `${recordsLeftPositions[index]}px`;
-    record.style.top = `${recordsTopPositions[index]-50}px`;
-
-    
-    record.addEventListener('mousedown', (e) => {
-      event.preventDefault();
-      selectedRecord = record;
-
-      zIndex += 1;
-      selectedRecord.style.zIndex = zIndex;
-
-      offsetX = e.clientX - record.getBoundingClientRect().left;
-      offsetY = e.clientY - record.getBoundingClientRect().top;
-
-      document.body.style.cursor = 'grab';
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', onMouseUp);
-    });
-  });
-
-  function onMouseMove(e) {
-    event.preventDefault();
-    if(selectedRecord) {
-      selectedRecord.style.left = (e.clientX - offsetX) + 'px';
-      selectedRecord.style.top = (e.clientY - offsetY) + 'px';
-    }
+  let samplesArray;
+  let socketsArray;
+  if (sampleParent.id === 'sockets-wrapper') {
+    samplesArray = appState.player.sockets;
+  } else {
+    samplesArray = appState.player.samples;
+  }
+  if (socketParent.id === 'samples-wrapper') {
+    socketsArray = appState.player.samples;
+  } else {
+    socketsArray = appState.player.sockets;
   }
 
-  function onMouseUp() {
-    event.preventDefault();
-    let selectedRecordSrc = selectedRecord.src;
-    
-    
-    if(selectedRecord) {
-      
-      document.body.style.cursor = 'default';
-      const selectedRecordTop = selectedRecord.getBoundingClientRect().top;
-      const selectedRecordRight = selectedRecord.getBoundingClientRect().right;
-      const selectedRecordBottom = selectedRecord.getBoundingClientRect().bottom;
-      const selectedRecordLeft = selectedRecord.getBoundingClientRect().left;
-      
-      const emptyRecordOneTop = emptyRecordOne.getBoundingClientRect().top;
-      const emptyRecordOneRight = emptyRecordOne.getBoundingClientRect().right;
-      const emptyRecordOneBottom = emptyRecordOne.getBoundingClientRect().bottom;
-      const emptyRecordOneLeft = emptyRecordOne.getBoundingClientRect().left;
+  const temp = samplesArray[sampleIdx];
+  samplesArray[sampleIdx] = socketsArray[sockedIdx];
+  socketsArray[sockedIdx] = temp;
 
-      const emptyRecordTwoTop = emptyRecordTwo.getBoundingClientRect().top;
-      const emptyRecordTwoRight = emptyRecordTwo.getBoundingClientRect().right;
-      const emptyRecordTwoBottom = emptyRecordTwo.getBoundingClientRect().bottom;
-      const emptyRecordTwoLeft = emptyRecordTwo.getBoundingClientRect().left;
+  const sampleIndex = Array.from(sampleParent.children).findIndex((child) => child.id === sample.id);
+  const nextSample = sampleParent.children[sampleIndex + 1];
 
-      const emptyRecordThreeTop = emptyRecordThree.getBoundingClientRect().top;
-      const emptyRecordThreeRight = emptyRecordThree.getBoundingClientRect().right;
-      const emptyRecordThreeBottom = emptyRecordThree.getBoundingClientRect().bottom;
-      const emptyRecordThreeLeft = emptyRecordThree.getBoundingClientRect().left;
+  const socketIndex = Array.from(socketParent.children).findIndex((child) => child.id === socket.id);
+  const nextSocket = socketParent.children[socketIndex + 1];
 
-      const emptyRecordFourTop = emptyRecordFour.getBoundingClientRect().top;
-      const emptyRecordFourRight = emptyRecordFour.getBoundingClientRect().right;
-      const emptyRecordFourBottom = emptyRecordFour.getBoundingClientRect().bottom;
-      const emptyRecordFourLeft = emptyRecordFour.getBoundingClientRect().left;
-
-      const emptyRecordFiveTop = emptyRecordFive.getBoundingClientRect().top;
-      const emptyRecordFiveRight = emptyRecordFive.getBoundingClientRect().right;
-      const emptyRecordFiveBottom = emptyRecordFive.getBoundingClientRect().bottom;
-      const emptyRecordFiveLeft = emptyRecordFive.getBoundingClientRect().left;
-
-      console.log(selectedRecordLeft);
-      console.log(emptyRecordOneLeft);
-      console.log(selectedRecordSrc);
-      
-      
-      
-      if(selectedRecordTop >= emptyRecordOneTop &&
-        selectedRecordRight <= emptyRecordOneRight &&
-        selectedRecordBottom <= emptyRecordOneBottom &&
-        selectedRecordLeft >= emptyRecordOneLeft
-        ) {
-        replaceEmptyRecordOneToFillingRecord(selectedRecordSrc)
-      }
-
-      if(selectedRecordTop >= emptyRecordTwoTop &&
-        selectedRecordRight <= emptyRecordTwoRight &&
-        selectedRecordBottom <= emptyRecordTwoBottom &&
-        selectedRecordLeft >= emptyRecordTwoLeft
-        ) {
-          replaceEmptyRecordTwoToFillingRecord(selectedRecordSrc)
-      }
-
-      if(selectedRecordTop >= emptyRecordThreeTop &&
-        selectedRecordRight <= emptyRecordThreeRight &&
-        selectedRecordBottom <= emptyRecordThreeBottom &&
-        selectedRecordLeft >= emptyRecordThreeLeft
-        ) {
-          replaceEmptyRecordThreeToFillingRecord(selectedRecordSrc)
-      }
-
-      if(selectedRecordTop >= emptyRecordFourTop &&
-        selectedRecordRight <= emptyRecordFourRight &&
-        selectedRecordBottom <= emptyRecordFourBottom &&
-        selectedRecordLeft >= emptyRecordFourLeft
-        ) {
-          replaceEmptyRecordFourToFillingRecord(selectedRecordSrc)
-      }
-
-      if(selectedRecordTop >= emptyRecordFiveTop &&
-        selectedRecordRight <= emptyRecordFiveRight &&
-        selectedRecordBottom <= emptyRecordFiveBottom &&
-        selectedRecordLeft >= emptyRecordFiveLeft
-        ) {
-          replaceEmptyRecordFiveToFillingRecord(selectedRecordSrc)
-      }
-      
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
-    }
+  if (nextSocket) {
+    socketParent.insertBefore(sample, nextSocket);
+  } else {
+    socketParent.appendChild(sample);
   }
 
-})
+  if (nextSample) {
+    sampleParent.insertBefore(socket, nextSample);
+  } else {
+    sampleParent.appendChild(socket);
+  }
+};
 
+let currentPicSrc;
 
+const dragStart = (dragStartEvent) => {
+  dragStartEvent.dataTransfer.setData('sample-id', dragStartEvent.target.id);
+  currentPicSrc = dragStartEvent.target.src;
+  dragStartEvent.target.src = '/img/empty-record.png';
+};
+
+const dragEnd = (dragEndEvent) => {
+  dragEndEvent.target.src = currentPicSrc;
+};
+
+const dragOver = (dragOverEvent) => {
+  dragOverEvent.preventDefault();
+};
+
+const dragDrop = (dragDropEvent) => {
+  dragDropEvent.preventDefault();
+  const sampleId = dragDropEvent.dataTransfer.getData('sample-id');
+
+  const socket = dragDropEvent.target;
+  const sample = document.getElementById(sampleId);
+  sample.src = currentPicSrc;
+
+  switchSampleAndSocket(sample, socket);
+  userLocalService.savePlayer(appState.player);
+};
+
+let touchedSample;
+let touchedSampleClone;
+
+const touchStart = (event) => {
+  touchedSample = event.target;
+  touchedSampleClone = touchedSample.cloneNode(false);
+  touchedSample.src = '/img/empty-record.png';
+  touchedSampleClone.style.position = 'absolute';
+  document.body.appendChild(touchedSampleClone);
+};
+
+const touchMove = (event) => {
+  const touch = event.touches[0];
+  
+  touchedSampleClone.style.left = touch.clientX - touchedSample.offsetWidth / 2 + 'px';
+  touchedSampleClone.style.top = touch.clientY - touchedSample.offsetHeight / 2 + 'px';
+};
+
+const touchEnd = (event) => {
+  const touch = event.changedTouches[0];
+  document.body.removeChild(touchedSampleClone);
+  const targetSocket = document.elementFromPoint(touch.clientX, touch.clientY);
+
+  touchedSample.src = touchedSampleClone.src;
+  if (targetSocket.id.includes('socket')) {
+    switchSampleAndSocket(touchedSample, targetSocket);
+    userLocalService.savePlayer(appState.player);
+  }
+};
+
+sockets.forEach((socket) => {
+  socket.addEventListener('dragover', dragOver);
+  socket.addEventListener('drop', dragDrop);
+});
+samples.forEach((sample) => {
+  sample.addEventListener('dragstart', dragStart);
+  sample.addEventListener('dragend', dragEnd);
+  sample.addEventListener('touchstart', touchStart);
+  sample.addEventListener('touchmove', touchMove);
+  sample.addEventListener('touchend', touchEnd);
+});
