@@ -421,7 +421,7 @@ const showSigninModal = () => {
 buttonLogin.addEventListener('click', showLoginModal);
 buttonSignin.addEventListener('click', showSigninModal);
 
-// ====== МОДАЛЬНОЕ ОКНО ======
+// ====== МОДАЛЬНЫЕ ОКНА ======
 const createModal = (config) => {
   const {
     title,
