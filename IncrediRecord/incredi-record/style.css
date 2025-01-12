@@ -38,30 +38,40 @@ main {
 
 .content-wrapper {
   display: flex;
-  flex-direction: column;
-  gap: 40%;
-  align-items: center;
-  background-image: url(../img/game-bck-hd.jpg);
-  background-size: cover;
+  justify-content: space-around;
+  gap: 32px;
+  background: linear-gradient(90deg, rgba(117,117,117,1) 48%, rgba(78,75,75,1) 100%);
   width: 80%;
   border-radius: 10px;
+  padding: 16px;
 }
-.empty-records-wrapper {
-  width: 100%;
+.sockets-wrapper {
+  width: 15vw;
   display: flex;
-  justify-content: space-around;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
 }
-.empty-records-wrapper img {
-  width: 20%;
+.empty-socket {
+  width: 75px;
+  height: 75px;
 }
-.filling-records-wrapper {
-  width: 100%;
-  height: 20%;
+.samples-wrapper {
+  width: 15vw;
   display: flex;
-  justify-content: space-around;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
 }
-.filling-record {
-  width: 10%;
+.sample {
+  width: 75px;
+  height: 75px;
+  cursor: grab;
+}
+.sample:active {
+  cursor: grabbing;
 }
 
 footer {
@@ -160,10 +170,18 @@ footer {
 .alert-icon {
   margin-right: 8px;
 }
+.spinner-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(15, 15, 15, 0.5);
+}
 .spinner {
-  height: 120px;
-  width: 120px;
-  border: 6px solid;
+  height: 40px;
+  width: 40px;
+  border: 3px solid;
   border-color: white transparent white transparent;
   border-radius: 50%;
   animation: spin 1.3s ease infinite;
